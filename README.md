@@ -70,10 +70,6 @@ export const getUsers = () => axiosInstance.get('/users');
 
 요청·응답 인터셉터로 토큰 주입과 401 리다이렉트를 처리합니다.
 
-## Roadmap
-
-Dark Mode · Storybook · Docker · GitHub Actions
-
 ## License
 
 MIT
