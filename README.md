@@ -1,127 +1,79 @@
 # React Admin Template
 
-React, TypeScript, Vite 기반의 관리자(Admin) 템플릿입니다.
+React + TypeScript + Vite 기반 관리자 템플릿. MUI, React Query, Zustand, React Hook Form으로 CMS·ERP·Back Office·대시보드를 빠르게 구축합니다.
 
-MUI, React Query, Zustand, React Hook Form을 활용하여 CMS, ERP, Back Office, 운영 대시보드를 빠르게 구축할 수 있도록 설계되었습니다.
+## Stack
 
----
+React · TypeScript · Vite · MUI · React Router · React Query · Axios · Zustand · React Hook Form · Zod · Dayjs · Vitest · ESLint · Prettier · Husky
 
-## 🚀 Tech Stack
+## Features
 
-* React
-* TypeScript
-* Vite
-* MUI
-* React Router
-* React Query
-* Axios
-* Zustand
-* React Hook Form
-* Zod
-* Dayjs
-* ESLint
-* Prettier
-* Husky
-* Lint-Staged
+- 인증 (로그인/로그아웃, 토큰 저장, 보호된 라우트)
+- RBAC 기반 메뉴·라우트 접근 제어
+- Axios API Layer (인터셉터로 토큰 주입 · 401 처리 · 공통 에러)
+- React Query 서버 상태 관리
+- Zustand 전역 상태 관리
+- React Hook Form + Zod 검증
+- Vitest + Testing Library
+- ESLint + Prettier + Husky + Lint-Staged
 
----
-
-## ✨ Features
-
-* TypeScript 기반 개발 환경
-* Material UI 기반 관리자 UI
-* React Query 서버 상태 관리
-* Zustand 전역 상태 관리
-* Axios API Layer
-* React Hook Form + Zod Validation
-* ESLint + Prettier 적용
-* Husky + Lint-Staged Git Hooks
-* 확장 가능한 프로젝트 구조
-
----
-
-## 🤔 Why This Template?
-
-* 빠른 관리자 시스템 구축
-* 실무 중심 아키텍처
-* 타입 안정성 보장
-* 최소한의 보일러플레이트
-* 유지보수 용이성
-
----
-
-## 📂 Project Structure
-
-```text
-src
-├── api
-├── components
-├── hooks
-├── layouts
-├── pages
-├── providers
-├── routes
-├── schemas
-├── stores
-├── types
-└── utils
-```
-
----
-
-## 📦 Installation
+## Quick Start
 
 ```bash
-git clone <repository-url>
-
+git clone https://github.com/<owner>/react-admin-template.git
 cd react-admin-template
-
 npm install
+cp .env.example .env
 npm run dev
 ```
 
----
+## Scripts
 
-## ⚙️ Environment
+```bash
+npm run dev       # 개발 서버
+npm run build     # 프로덕션 빌드
+npm run preview   # 빌드 미리보기
+npm run lint      # 린트
+npm run test      # 테스트
+```
+
+## Environment
 
 ```env
 VITE_API_BASE_URL=http://localhost:3000
 ```
 
----
+`.env.development` / `.env.production`으로 모드별 분리. 값은 `.env.example` 참고.
 
-## 📡 API Example
+## Structure
 
-```typescript
-export const getUsers = () => {
-  return axiosInstance.get('/users');
-};
+```text
+src
+├── api          # axios 인스턴스, 인터셉터, 요청 함수
+├── components
+├── hooks
+├── layouts
+├── pages
+├── providers
+├── routes       # 라우트 정의 + 가드
+├── schemas      # zod 스키마
+├── stores       # zustand
+├── types
+└── utils
 ```
 
----
-
-## 📝 Validation Example
+## API Example
 
 ```typescript
-const schema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-});
+export const getUsers = () => axiosInstance.get('/users');
 ```
 
----
+요청·응답 인터셉터로 토큰 주입과 401 리다이렉트를 처리합니다.
 
-## 🗺 Roadmap
+## Roadmap
 
-* [ ] Authentication
-* [ ] RBAC
-* [ ] Dark Mode
-* [ ] Storybook
-* [ ] Docker
-* [ ] GitHub Actions
+Dark Mode · Storybook · Docker · GitHub Actions
 
----
+## License
 
-## 📄 License
-
-MIT License
+MIT
