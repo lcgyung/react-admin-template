@@ -81,9 +81,3 @@ src
 - **최소 보일러플레이트** — 불필요한 추상화를 피하고 간결하게 작성합니다.
 - **ESLint + Prettier** — 모든 코드는 린트/포매팅 규칙을 통과해야 합니다 (`pnpm lint`, `pnpm format`).
 - **Husky + Lint-Staged** — 커밋 시 변경 파일에 자동으로 `eslint --fix` + `prettier`가 적용됩니다.
-
-## 로드맵
-
-- [ ] **TDD 워크플로우 자동화 (Claude Code skills + hooks)** — 편집 시 PostToolUse 자동 포맷 +
-      종료 시 Stop 게이트로 `test`/`lint`/`prettier --check` 차단. 상세 설계와 작업계획:
-      [`docs/tdd-workflow.md`](docs/tdd-workflow.md).
