@@ -1,8 +1,8 @@
 import { Box, Toolbar } from '@mui/material';
 import { Outlet } from 'react-router-dom';
 
-import { Header } from './components/Header';
-import { Sidebar } from './components/Sidebar';
+import { Header } from './Header';
+import { Sidebar } from './Sidebar';
 
 export const MainLayout = () => (
   <Box sx={{ display: 'flex', minHeight: '100vh' }}>
