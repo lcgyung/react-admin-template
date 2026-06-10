@@ -109,4 +109,4 @@ src
 - **PreToolUse(Bash)** → `guard-bash.sh`: 파괴적 명령(`rm -rf /`, force push, `reset --hard` 등)을 차단.
 - **PostToolUse(Edit/Write)** → `format-changed-file.sh`: 변경된 `*.ts(x)` 에 `eslint --fix` + `prettier` 자동 적용.
 - **Stop** → `gate.sh`: 세션 종료 전 `tsc -b --noEmit` + `eslint .` 게이트. 실패하면 `exit 2` 로 계속 수정을 유도한다(vitest 게이트는 기본 비활성, 주석 처리됨).
-- `.claude/agents/code-reviewer.md`, `.claude/skills/code-review/`, 그리고 현황 문서 [`docs/claude-hooks-status.md`](docs/claude-hooks-status.md) 가 함께 제공된다.
+- `.claude/agents/code-reviewer.md`, `.claude/skills/code-review/`, 그리고 로드맵 문서 [`docs/claude-hooks-roadmap.md`](docs/claude-hooks-roadmap.md) 가 함께 제공된다.
