@@ -14,8 +14,27 @@ pnpm 명령을 사용하세요.
 > 참고: pnpm 10+ 는 보안상 의존성의 빌드 스크립트를 기본 차단합니다. `esbuild`/`msw` 의 빌드를
 > 허용하는 설정이 `pnpm-workspace.yaml`(`allowBuilds` / `onlyBuiltDependencies`)에 들어 있습니다.
 
-명령어는 `package.json` 의 `scripts` 를 참고하세요. 비자명한 점: `pnpm build` 는 `tsc -b`
-타입체크를 포함하고, `pnpm dev` 는 5173, `pnpm storybook` 은 6006 포트를 씁니다.
+## 자주 쓰는 명령어
+
+```bash
+pnpm dev                         # 개발 서버 (5173)
+pnpm build                       # tsc -b 타입체크 + vite build
+pnpm preview                     # 빌드 산출물 로컬 미리보기
+pnpm lint                        # eslint .
+pnpm format                      # prettier --write .
+
+pnpm test                        # 단위/컴포넌트 테스트 (vitest run, jsdom)
+pnpm test:watch                  # watch 모드
+pnpm exec vitest run src/routes/guards.test.tsx       # 단일 파일
+pnpm exec vitest run -t "redirects to /login"         # 테스트명(-t)으로 단일 케이스
+
+pnpm exec tsc -b --noEmit        # 타입체크 단독 (project references; Stop 게이트가 사용)
+
+pnpm storybook                   # Storybook (6006)
+pnpm build-storybook             # 정적 Storybook 빌드
+```
+
+> 전체 스크립트·데모 계정·환경 변수는 [`README.md`](README.md) 참고.
 
 ## 프로젝트 구조
 
@@ -81,3 +100,13 @@ src
 - **최소 보일러플레이트** — 불필요한 추상화를 피하고 간결하게 작성합니다.
 - **ESLint + Prettier** — 모든 코드는 린트/포매팅 규칙을 통과해야 합니다 (`pnpm lint`, `pnpm format`).
 - **Husky + Lint-Staged** — 커밋 시 변경 파일에 자동으로 `eslint --fix` + `prettier`가 적용됩니다.
+
+## Claude Code 자동화 (`.claude/`)
+
+`.claude/settings.json` 이 훅을 등록한다. 코드를 만질 때 아래 동작을 전제로 한다.
+
+- **SessionStart** → `session-context.sh`: 브랜치 등 컨텍스트를 주입.
+- **PreToolUse(Bash)** → `guard-bash.sh`: 파괴적 명령(`rm -rf /`, force push, `reset --hard` 등)을 차단.
+- **PostToolUse(Edit/Write)** → `format-changed-file.sh`: 변경된 `*.ts(x)` 에 `eslint --fix` + `prettier` 자동 적용.
+- **Stop** → `gate.sh`: 세션 종료 전 `tsc -b --noEmit` + `eslint .` 게이트. 실패하면 `exit 2` 로 계속 수정을 유도한다(vitest 게이트는 기본 비활성, 주석 처리됨).
+- `.claude/agents/code-reviewer.md`, `.claude/skills/code-review/`, 그리고 현황 문서 [`docs/claude-hooks-status.md`](docs/claude-hooks-status.md) 가 함께 제공된다.
