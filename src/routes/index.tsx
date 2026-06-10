@@ -5,11 +5,11 @@ import { RoleRoute } from './RoleRoute';
 import { paths } from '@/shared/config/paths';
 import { AuthLayout } from '@/widgets/auth-layout';
 import { MainLayout } from '@/widgets/main-layout';
-import { DashboardPage } from '@/pages/DashboardPage';
-import { ForbiddenPage } from '@/pages/ForbiddenPage';
-import { LoginPage } from '@/pages/LoginPage';
-import { NotFoundPage } from '@/pages/NotFoundPage';
-import { UsersPage } from '@/pages/UsersPage';
+import { DashboardPage } from '@/pages/dashboard';
+import { ForbiddenPage } from '@/pages/forbidden';
+import { LoginPage } from '@/pages/login';
+import { NotFoundPage } from '@/pages/not-found';
+import { UsersPage } from '@/pages/users';
 
 export const router = createBrowserRouter([
   {
