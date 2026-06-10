@@ -27,7 +27,7 @@ pnpm format                      # prettier --write .
 pnpm test                        # 단위/컴포넌트 테스트 (vitest run, jsdom)
 pnpm test:watch                  # watch 모드
 pnpm exec vitest run src/pages/login/ui/LoginPage.test.tsx   # 단일 파일
-pnpm exec vitest run -t "redirects to /login"                # 테스트명(-t)으로 단일 케이스
+pnpm exec vitest run -t "짧은 비밀번호"                       # 테스트명(-t)으로 단일 케이스
 
 pnpm exec tsc -b --noEmit        # 타입체크 단독 (project references; Stop 게이트가 사용)
 
