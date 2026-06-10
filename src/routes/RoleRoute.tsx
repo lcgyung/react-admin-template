@@ -1,6 +1,6 @@
 import { Navigate, Outlet } from 'react-router-dom';
 
-import { paths } from './paths';
+import { paths } from '@/shared/config/paths';
 import { useAuthStore } from '@/stores/authStore';
 import type { Role } from '@/types/user';
 

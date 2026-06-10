@@ -1,4 +1,4 @@
-import { axiosInstance } from './axiosInstance';
+import { axiosInstance } from '@/shared/api/axiosInstance';
 import type { LoginRequest, LoginResponse } from '@/types/auth';
 import type { User } from '@/types/user';
 

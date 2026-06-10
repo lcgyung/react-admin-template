@@ -2,7 +2,7 @@ import { createBrowserRouter } from 'react-router-dom';
 
 import { ProtectedRoute } from './ProtectedRoute';
 import { RoleRoute } from './RoleRoute';
-import { paths } from './paths';
+import { paths } from '@/shared/config/paths';
 import { AuthLayout } from '@/layouts/AuthLayout';
 import { MainLayout } from '@/layouts/MainLayout';
 import { DashboardPage } from '@/pages/DashboardPage';

@@ -1,8 +1,8 @@
 import { Box } from '@mui/material';
 
-import { Loading } from '@/components/common/Loading';
-import { PageHeader } from '@/components/common/PageHeader';
-import { StatCard } from '@/components/common/StatCard';
+import { Loading } from '@/shared/ui/Loading';
+import { PageHeader } from '@/shared/ui/PageHeader';
+import { StatCard } from '@/shared/ui/StatCard';
 import { useUsers } from '@/hooks/useUsers';
 import { useAuthStore } from '@/stores/authStore';
 

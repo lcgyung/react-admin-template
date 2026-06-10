@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
 import { getMe, login, logout } from '@/api/auth';
-import { paths } from '@/routes/paths';
+import { paths } from '@/shared/config/paths';
 import { useAuthStore } from '@/stores/authStore';
 import type { LoginRequest } from '@/types/auth';
 

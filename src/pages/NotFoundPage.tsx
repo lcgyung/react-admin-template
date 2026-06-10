@@ -1,7 +1,7 @@
 import { Box, Button, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 
-import { paths } from '@/routes/paths';
+import { paths } from '@/shared/config/paths';
 
 export const NotFoundPage = () => (
   <Box

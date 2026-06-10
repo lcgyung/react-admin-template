@@ -1,4 +1,4 @@
-import { axiosInstance } from './axiosInstance';
+import { axiosInstance } from '@/shared/api/axiosInstance';
 import type { CreateUserInput, User } from '@/types/user';
 
 export const getUsers = async () => {
