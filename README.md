@@ -91,6 +91,10 @@ export const getUsers = async () => {
 요청·응답 인터셉터로 토큰 주입과 401 리다이렉트를 처리합니다(인증 콜백은 `app/config/configureApi.ts`
 에서 주입). 컴포넌트는 axios를 직접 호출하지 않고 `features/*`의 React Query 훅을 거칩니다.
 
+## Contributing
+
+브랜치 전략·커밋 컨벤션·버전 규칙은 [CONTRIBUTING.md](CONTRIBUTING.md)를, 변경 이력은 [CHANGELOG.md](CHANGELOG.md)를 참고하세요.
+
 ## License
 
 MIT
