@@ -1,16 +1,9 @@
 import '@testing-library/jest-dom/vitest';
+// 제거 금지: axios 토큰 주입을 활성화하는 side-effect import (미주입 시 조용히 no-op).
+import '@/app/config/configureApi';
 import { afterAll, afterEach, beforeAll } from 'vitest';
 
-import { server } from '@/mocks/server';
-import { configureAuthInterceptors } from '@/shared/api/axiosInstance';
-import { clearAuthState, getAuthToken } from '@/entities/session';
-
-// axios 인증 콜백 주입 (FSD 6단계에서 app/config/configureApi.ts 로 일원화 예정).
-// 미주입 시 토큰 주입 동작이 조용히 비활성화된다 — 제거 금지. (jsdom 테스트라 리다이렉트는 생략)
-configureAuthInterceptors({
-  getToken: getAuthToken,
-  onUnauthorized: clearAuthState,
-});
+import { server } from '@/app/mocks/server';
 
 // MSW: 테스트 전반에 걸쳐 목 서버를 기동/리셋/종료한다.
 beforeAll(() => server.listen({ onUnhandledRequest: 'warn' }));
