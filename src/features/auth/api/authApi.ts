@@ -1,5 +1,5 @@
 import { axiosInstance } from '@/shared/api/axiosInstance';
-import type { LoginRequest, LoginResponse } from '@/types/auth';
+import type { LoginRequest, LoginResponse } from '../model/types';
 import type { User } from '@/entities/user';
 
 export const login = async (payload: LoginRequest) => {

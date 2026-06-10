@@ -1,10 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
-import { getMe, login, logout } from '@/api/auth';
+import { getMe, login, logout } from '../api/authApi';
 import { paths } from '@/shared/config/paths';
 import { useAuthStore } from '@/entities/session';
-import type { LoginRequest } from '@/types/auth';
+import type { LoginRequest } from './types';
 
 export const useLogin = () => {
   const setAuth = useAuthStore((s) => s.setAuth);

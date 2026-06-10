@@ -4,9 +4,9 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import { AppBar, Chip, IconButton, Toolbar, Tooltip, Typography } from '@mui/material';
 
 import { DRAWER_WIDTH } from './Sidebar';
-import { useLogout } from '@/hooks/useAuth';
+import { useLogout } from '@/features/auth';
 import { useAuthStore } from '@/entities/session';
-import { useThemeStore } from '@/stores/themeStore';
+import { useThemeStore } from '@/features/theme';
 
 export const Header = () => {
   const user = useAuthStore((s) => s.user);

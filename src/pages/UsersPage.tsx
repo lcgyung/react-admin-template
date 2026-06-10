@@ -12,7 +12,7 @@ import {
 
 import { Loading } from '@/shared/ui/Loading';
 import { PageHeader } from '@/shared/ui/PageHeader';
-import { useUsers } from '@/hooks/useUsers';
+import { useUsers } from '@/features/users';
 import type { Role } from '@/entities/user';
 import { formatDate } from '@/shared/lib/format';
 

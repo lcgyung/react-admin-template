@@ -2,7 +2,7 @@ import { CssBaseline, ThemeProvider as MuiThemeProvider, createTheme } from '@mu
 import { useMemo } from 'react';
 import type { ReactNode } from 'react';
 
-import { useThemeStore } from '@/stores/themeStore';
+import { useThemeStore } from '../model/themeStore';
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const mode = useThemeStore((s) => s.mode);
