@@ -4,6 +4,9 @@
 > 코드베이스 검증을 거친 **실행 가능한 단계·명령·순서**까지 단일 출처로 통합한다.
 > 자매 프로젝트 `react-pwa-template`도 동일 설계를 동시 적용한다(별도 리포지토리 → 후속 작업).
 > 차이점은 **MUI**(Tailwind/Shadcn 아님)와 **PWA 레이어 없음**이다.
+>
+> 또한 **FSD 강제(7단계)** 와 **게이트/자동화 후속(FSD 독립)** 을 본 문서의 단일 로드맵으로
+> 포함한다(구 `claude-hooks-roadmap.md` 흡수·삭제).
 
 ## 1. 배경 / 목표
 
@@ -292,12 +295,11 @@ configureAuthInterceptors({
 
 ### 6.3 문서
 
-| 파일                           | 변경                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `CLAUDE.md`                    | "프로젝트 구조" 트리 전면 교체. 아키텍처 규칙의 경로 참조 갱신: `src/hooks`→`features/*/model`, `src/api`→`shared/api`+`features/*/api`, `src/stores`→`entities/session`+`features/theme/model`, `src/schemas`→`features/*/model`, `src/routes`→`app/router`+`shared/config/paths`, `src/mocks`→`app/mocks`. **FSD 의존성 규칙 · Public API 규칙 섹션 신설** + axios 브리지 gotcha 명시. stale `src/routes/guards.test.tsx` 참조 정리 |
-| `README.md`                    | "## Structure" 트리 교체                                                                                                                                                                                                                                                                                                                                                                                                              |
-| `docs/claude-hooks-roadmap.md` | 영향 없음 (훅 동작 무관)                                                                                                                                                                                                                                                                                                                                                                                                              |
-| `docs/fsd-migration.md`        | 본 문서                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| 파일                    | 변경                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `CLAUDE.md`             | "프로젝트 구조" 트리 전면 교체. 아키텍처 규칙의 경로 참조 갱신: `src/hooks`→`features/*/model`, `src/api`→`shared/api`+`features/*/api`, `src/stores`→`entities/session`+`features/theme/model`, `src/schemas`→`features/*/model`, `src/routes`→`app/router`+`shared/config/paths`, `src/mocks`→`app/mocks`. **FSD 의존성 규칙 · Public API 규칙 섹션 신설** + axios 브리지 gotcha 명시. stale `src/routes/guards.test.tsx` 참조 정리 |
+| `README.md`             | "## Structure" 트리 교체                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `docs/fsd-migration.md` | 본 문서                                                                                                                                                                                                                                                                                                                                                                                                                               |
 
 ### 6.4 스킬 (`.claude/skills/code-review/SKILL.md`)
 
@@ -306,19 +308,19 @@ configureAuthInterceptors({
 ### 6.5 서브에이전트 (`.claude/agents/code-reviewer.md`)
 
 - React+MUI 리뷰 기준만 기술, 폴더 구조 참조 없음 → **영향 없음**.
-- (선택) "FSD 레이어 경계/Public API 위반" 점검 항목 추가 가능.
+- **7단계 확정**: `code-review` 스킬 + 본 에이전트에 "FSD 레이어 경계 / 같은-레이어 cross-import / Public API 우회(배럴 미경유)" 점검 항목 추가.
 
 ### 6.6 훅 (`.claude/hooks/*`, `.claude/settings.json`)
 
 | 훅                                     | 영향                                                                                                                                                                                                                    |
 | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `session-context.sh` (SessionStart)    | MUI 규칙만 주입 → 영향 없음. (선택) FSD 규칙 한 줄 추가 가능                                                                                                                                                            |
+| `session-context.sh` (SessionStart)    | MUI 규칙만 주입 → 영향 없음. **7단계 확정**: FSD 규칙 주입(레이어 단방향 + Public API 경유)                                                                                                                             |
 | `guard-bash.sh` (PreToolUse)           | 파괴적 명령 차단, 경로 무관 → 영향 없음                                                                                                                                                                                 |
 | `format-changed-file.sh` (PostToolUse) | 확장자 글롭 기반, `file_path` 절대경로 → 영향 없음                                                                                                                                                                      |
 | `gate.sh` (Stop)                       | `tsc -b --noEmit` + `eslint .` 전역 → 동작 무관. 이미 `cd "$CLAUDE_PROJECT_DIR"`로 repo 루트 보정됨(하위 디렉터리 실행 시 거짓실패 방지). 7단계에서 vitest 블록 활성화 + `steiger ./src` 추가(**즉시 error 하드 차단**) |
 | `settings.json`                        | 훅 등록은 파일명 기반 → **변경 불필요**                                                                                                                                                                                 |
 
-**요약**: `.claude/` 자산(훅·스킬·서브에이전트·settings)은 폴더 구조 비의존적이라 **기능 영향이 없다.** 선택적 강화(게이트에 steiger/vitest, 컨텍스트에 FSD 규칙)만 권장.
+**요약**: `.claude/` 자산(훅·스킬·서브에이전트·settings)은 폴더 구조 비의존적이라 **마이그레이션 자체엔 기능 영향이 없다.** 단 **FSD 일관성 코딩 강제**를 위해 7단계에서 게이트(steiger/vitest)·컨텍스트(FSD 규칙)·리뷰(경계 점검)를 **확정 적용**한다.
 
 ---
 
@@ -380,13 +382,17 @@ configureAuthInterceptors({
 - 루트 파일 import 갱신: `main.tsx`(`@/App→@/app/App`, `@/mocks/browser→@/app/mocks/browser`), `vitest.setup.ts`(`@/mocks/server→@/app/mocks/server`). `vite-env.d.ts`는 루트 유지.
 - 그 외 `@/providers/*`, `@/routes`, `@/mocks/*` 잔여 import 정리. → 게이트.
 
-### 7단계 — Steiger(하드 에러) + CI/게이트 + 문서
+### 7단계 — FSD 일관성 강제(Steiger + 컨텍스트 + 리뷰) + CI/게이트 + 문서
 
-- devDeps 추가: `steiger`, `@feature-sliced/steiger-plugin`(pnpm). `steiger.config.ts`(루트) → `fsd.configs.recommended`.
+> **FSD 벗어나지 않는 코딩**을 강제하는 3종 가드(선제+반응+리뷰). **1~6단계(폴더 이전) 완료가 선행 필수.**
+
+- **(반응/게이트)** devDeps 추가: `steiger`, `@feature-sliced/steiger-plugin`(pnpm). `steiger.config.ts`(루트) → `fsd.configs.recommended`.
 - `package.json` 스크립트: `"lint:fsd": "steiger ./src"`.
 - **위반 0 확인**: Option B(axios) + `@x`(session→user) + 단일슬라이스(widget) 보정으로 **3개 같은-레이어/상향 엣지 모두 구조적 해소** → `pnpm lint:fsd` 위반 0.
 - `.github/workflows/ci.yml`(**기존 파일**): Lint 스텝 뒤에 `pnpm lint:fsd` 추가(**위반 시 실패**).
-- `.claude/hooks/gate.sh`: 주석 처리된 vitest 블록 임시 활성화 + `steiger ./src` 추가(**즉시 error 하드 차단**. cwd 보정 `cd`는 이미 적용됨).
+- **(반응/게이트)** `.claude/hooks/gate.sh`: 주석 처리된 vitest 블록 임시 활성화 + `steiger ./src` 추가(**즉시 error 하드 차단**. cwd 보정 `cd`는 이미 적용됨).
+- **(선제/가이드)** `.claude/hooks/session-context.sh`: FSD 규칙 한 단락 주입 — 레이어 단방향 의존(`app>pages>widgets>features>entities>shared`) + 슬라이스 간 import는 `index.ts` Public API 경유.
+- **(리뷰)** `.claude/skills/code-review/SKILL.md` + `.claude/agents/code-reviewer.md`: "레이어 경계 위반 / 같은-레이어 cross-import / Public API 우회(배럴 미경유)" 점검 항목 추가.
 - 문서: `CLAUDE.md`·`README.md` 구조 섹션 갱신 + **FSD 의존성/Public API 규칙 섹션 신설**(6.3 참조).
 
 ---
@@ -430,3 +436,31 @@ configureAuthInterceptors({
 - `pnpm build` — `tsc -b` + vite 프로덕션 빌드.
 - `pnpm storybook` 기동 → `PageHeader` 스토리(`shared/ui/PageHeader`) 로드 확인.
 - CI(`.github/workflows/ci.yml`)에서 lint→**lint:fsd**→test→build 그린 확인.
+
+---
+
+## 10. 후속: 게이트/자동화 강화 (FSD 독립)
+
+> 아래는 FSD 폴더 이전과 **무관**하게 독립 진행 가능(선행 의존 없음). 위 FSD 강제(7단계)와
+> 별개 트랙이다. (구 `claude-hooks-roadmap.md` 에서 흡수.)
+
+- [ ] **`/tdd` 스킬** (RED→GREEN→REFACTOR) — `.claude/skills/tdd/SKILL.md`. `code-review` 스킬과
+      같은 컨벤션. 예시: `src/utils/format.test.ts`(유닛), `src/pages/LoginPage.test.tsx`(컴포넌트+MSW).
+      "RED 상태로 턴 종료 금지" 명시.
+- [ ] **Stop 게이트에 vitest** — `pnpm exec vitest run --silent`. **`stop_hook_active` 무한루프
+      가드 동반(필수)**. (7단계의 vitest 활성화와 동일 작업.)
+- [ ] **Stop 게이트에 `prettier --check`** — 현재 누락. 켜기 전 트리 클린 확인.
+- [ ] **(백로그) coverage 임계값 ratchet** — "작업마다 테스트 존재"까지 기계적 강제.
+      `vitest run --coverage` + thresholds(`@vitest/coverage-v8`). 테스트 쌓인 뒤 점진 상향.
+- [ ] **문서 동기화** — 게이트 변경 후 `CLAUDE.md` "vitest 게이트 비활성/주석" 문구 갱신.
+
+### 메모 / 가드레일
+
+- **무한루프 가드(필수)** — 현 `gate.sh` 는 stdin/`stop_hook_active` 미검사 → 테스트 게이트 추가
+  시 반드시 시작부에서 stdin을 읽어 `stop_hook_active == true` 면 `exit 0`.
+- **전체 트리 검사 주의** — `eslint .`/`prettier --check .` 는 세션이 안 건드린 기존 이슈에도
+  막힌다(켜기 전 클린 확인).
+- **게이트의 한계** — "회귀 방지"지 미작성 테스트는 못 잡는다 → `/tdd`(소프트) + coverage
+  ratchet(하드)으로 보완.
+- **성능** — 전체 `vitest run` 유지, 느려지면(>~10s) `vitest related --run`.
+- **커밋 안전망** — husky/lint-staged 유지.
