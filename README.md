@@ -49,6 +49,7 @@ pnpm dev              # 개발 서버
 pnpm build            # 프로덕션 빌드 (타입체크 포함)
 pnpm preview          # 빌드 미리보기
 pnpm lint             # 린트
+pnpm lint:fsd         # FSD 아키텍처 린트 (Steiger)
 pnpm test             # 테스트
 pnpm storybook        # Storybook (port 6006)
 ```
@@ -64,20 +65,18 @@ VITE_ENABLE_MOCK=true   # MSW 목 API. 실제 백엔드 연동 시 false
 
 ## Structure
 
+[Feature-Sliced Design(FSD)](https://feature-sliced.design) 6레이어 구조. 레이어는 자기보다
+아래 레이어만 import할 수 있고, 슬라이스 간 import는 `index.ts`(Public API)를 경유합니다
+(`pnpm lint:fsd` = Steiger로 강제).
+
 ```text
 src
-├── api          # axios 인스턴스, 인터셉터, 요청 함수
-├── components   # 재사용 UI
-├── hooks        # React Query 훅
-├── layouts      # MainLayout(사이드바+헤더), AuthLayout
-├── mocks        # MSW 핸들러 · 시드 데이터
-├── pages        # 라우트 단위 페이지
-├── providers    # Query / Theme Provider
-├── routes       # 라우트 정의 + 가드 (Protected / Role)
-├── schemas      # zod 스키마
-├── stores       # zustand (auth / theme)
-├── types
-└── utils
+├── app          # providers, router(+가드), MSW mocks, config(axios 인증 주입)
+├── pages        # 라우트 화면 슬라이스 (login / dashboard / users / forbidden / not-found)
+├── widgets      # 합성 UI 블록 (main-layout: 사이드바+헤더 셸, auth-layout)
+├── features     # 사용자 기능 (auth: 로그인 훅·스키마, users: 조회·생성, theme: 다크모드)
+├── entities     # 도메인 모델 (user: User/Role 타입, session: 인증 스토어)
+└── shared       # 도메인 무관 인프라 (api: axios, ui: 공용 컴포넌트, lib, config: paths)
 ```
 
 ## API Example
@@ -89,8 +88,8 @@ export const getUsers = async () => {
 };
 ```
 
-요청·응답 인터셉터로 토큰 주입과 401 리다이렉트를 처리합니다. 컴포넌트는 axios를 직접
-호출하지 않고 `src/hooks`의 React Query 훅을 거칩니다.
+요청·응답 인터셉터로 토큰 주입과 401 리다이렉트를 처리합니다(인증 콜백은 `app/config/configureApi.ts`
+에서 주입). 컴포넌트는 axios를 직접 호출하지 않고 `features/*`의 React Query 훅을 거칩니다.
 
 ## License
 

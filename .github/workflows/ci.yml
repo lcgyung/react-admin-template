@@ -28,6 +28,9 @@ jobs:
       - name: Lint
         run: pnpm lint
 
+      - name: Lint FSD (Steiger)
+        run: pnpm lint:fsd
+
       - name: Test
         run: pnpm test
 

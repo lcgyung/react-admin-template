@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import { NavLink } from 'react-router-dom';
 
-import { paths } from '@/shared/config/paths';
+import { paths } from '@/shared/config';
 import { useAuthStore } from '@/entities/session';
 import type { Role } from '@/entities/user';
 

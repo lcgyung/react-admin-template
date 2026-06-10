@@ -1,4 +1,4 @@
-import { axiosInstance } from '@/shared/api/axiosInstance';
+import { axiosInstance } from '@/shared/api';
 import type { CreateUserInput, User } from '@/entities/user';
 
 export const getUsers = async () => {

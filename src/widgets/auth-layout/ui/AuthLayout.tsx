@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
 import { Navigate, Outlet } from 'react-router-dom';
 
-import { paths } from '@/shared/config/paths';
+import { paths } from '@/shared/config';
 import { useAuthStore } from '@/entities/session';
 
 export const AuthLayout = () => {

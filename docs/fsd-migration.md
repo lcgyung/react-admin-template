@@ -1,7 +1,12 @@
 # FSD 아키텍처 마이그레이션 — 설계 + 실행 계획 (react-admin-template)
 
-> 상태: **설계·실행 계획 문서** (실제 폴더 이전은 미수행). 본 문서는 설계 방안·영향도 분석에 더해,
+> 상태: **완료** (2026-06-10, 1~7단계 전부 실행 — dev 브랜치 단계별 커밋). 본 문서는 설계 방안·영향도 분석에 더해,
 > 코드베이스 검증을 거친 **실행 가능한 단계·명령·순서**까지 단일 출처로 통합한다.
+>
+> **실행 시 보정 1건**: Steiger `recommended`는 `shared`의 깊은 경로 import(`@/shared/api/axiosInstance`,
+> `@/shared/config/paths`)를 `fsd/no-public-api-sidestep` 위반으로 본다 → `shared/api`·`shared/config`에
+> **세그먼트 배럴**(`index.ts`)을 추가하고 `@/shared/api`·`@/shared/config`로 import하도록 조정했다
+> (`@/shared/ui/<Name>`·`@/shared/lib/<name>`은 폴더/파일 단위 그대로 허용). 최종 `pnpm lint:fsd` 위반 0.
 > 자매 프로젝트 `react-pwa-template`도 동일 설계를 동시 적용한다(별도 리포지토리 → 후속 작업).
 > 차이점은 **MUI**(Tailwind/Shadcn 아님)와 **PWA 레이어 없음**이다.
 >
