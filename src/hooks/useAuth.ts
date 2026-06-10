@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { getMe, login, logout } from '@/api/auth';
 import { paths } from '@/shared/config/paths';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/entities/session';
 import type { LoginRequest } from '@/types/auth';
 
 export const useLogin = () => {

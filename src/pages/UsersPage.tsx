@@ -13,7 +13,7 @@ import {
 import { Loading } from '@/shared/ui/Loading';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import { useUsers } from '@/hooks/useUsers';
-import type { Role } from '@/types/user';
+import type { Role } from '@/entities/user';
 import { formatDate } from '@/shared/lib/format';
 
 const roleColor: Record<Role, 'error' | 'warning' | 'default'> = {

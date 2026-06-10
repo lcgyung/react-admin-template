@@ -1,7 +1,7 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 
 import { paths } from '@/shared/config/paths';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/entities/session';
 
 export const ProtectedRoute = () => {
   const token = useAuthStore((s) => s.token);

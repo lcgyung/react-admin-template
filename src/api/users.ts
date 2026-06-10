@@ -1,5 +1,5 @@
 import { axiosInstance } from '@/shared/api/axiosInstance';
-import type { CreateUserInput, User } from '@/types/user';
+import type { CreateUserInput, User } from '@/entities/user';
 
 export const getUsers = async () => {
   const { data } = await axiosInstance.get<User[]>('/users');

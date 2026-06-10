@@ -1,4 +1,4 @@
-import type { User } from './user';
+import type { User } from '@/entities/user';
 
 export interface LoginRequest {
   email: string;

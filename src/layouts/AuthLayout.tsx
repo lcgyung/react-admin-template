@@ -2,7 +2,7 @@ import { Box } from '@mui/material';
 import { Navigate, Outlet } from 'react-router-dom';
 
 import { paths } from '@/shared/config/paths';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/entities/session';
 
 export const AuthLayout = () => {
   const token = useAuthStore((s) => s.token);

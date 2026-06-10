@@ -5,7 +5,7 @@ import { AppBar, Chip, IconButton, Toolbar, Tooltip, Typography } from '@mui/mat
 
 import { DRAWER_WIDTH } from './Sidebar';
 import { useLogout } from '@/hooks/useAuth';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/entities/session';
 import { useThemeStore } from '@/stores/themeStore';
 
 export const Header = () => {

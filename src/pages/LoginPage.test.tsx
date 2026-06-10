@@ -5,7 +5,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { LoginPage } from './LoginPage';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/entities/session';
 
 const renderLoginPage = () => {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });

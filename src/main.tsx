@@ -4,7 +4,7 @@ import { createRoot } from 'react-dom/client';
 import { App } from '@/App';
 import { configureAuthInterceptors } from '@/shared/api/axiosInstance';
 import { paths } from '@/shared/config/paths';
-import { clearAuthState, getAuthToken } from '@/stores/authStore';
+import { clearAuthState, getAuthToken } from '@/entities/session';
 
 // axios 인증 콜백 주입 (FSD 6단계에서 app/config/configureApi.ts 로 일원화 예정).
 // 미주입 시 토큰 주입·401 리다이렉트가 조용히 비활성화된다 — 제거 금지.

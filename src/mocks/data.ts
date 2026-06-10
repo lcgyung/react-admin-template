@@ -1,4 +1,4 @@
-import type { User } from '@/types/user';
+import type { User } from '@/entities/user';
 
 export interface MockAccount extends User {
   password: string;

@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-import type { User } from '@/types/user';
+import type { User } from '@/entities/user/@x/session';
 
 interface AuthState {
   token: string | null;
