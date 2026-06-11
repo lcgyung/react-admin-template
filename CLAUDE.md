@@ -91,5 +91,3 @@ paths에 안 걸리는 작업에서 해당 주제를 다루면 직접 Read 하�
 ## 문서 지도
 
 - 설계 결정(왜): [`docs/adr/`](docs/adr/README.md) — 상태관리·FSD·orval·토큰 저장·관찰가능성·CSP.
-- 구현 체크리스트: [`docs/harness-react-mui.md`](docs/harness-react-mui.md) ·
-  보안 점검표: [`docs/secure-harness-react-mui.md`](docs/secure-harness-react-mui.md).

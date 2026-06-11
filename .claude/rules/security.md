@@ -23,5 +23,3 @@ paths:
   [ADR 0005](../../docs/adr/0005-token-storage.md) 참고.
 - **RBAC 한계** — 라우트 가드·메뉴 필터링은 프런트엔드(UX) 차원의 제어일 뿐이다.
   실제 데이터 권한은 백엔드에서 강제해야 한다.
-
-> 점검표: [`docs/secure-harness-react-mui.md`](../../docs/secure-harness-react-mui.md)

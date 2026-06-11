@@ -1,9 +1,8 @@
 # 보안 정책 (Security Policy)
 
 이 문서는 **React Admin Template** 의 위협 모델, 의도된 보안 트레이드오프, 그리고 취약점 신고
-절차를 정리합니다. 구현된 보안 자동화·게이트 목록은 [`README.md`](README.md) "보안" 절을,
-시큐어 코딩 체크리스트는 [`docs/secure-harness-react-mui.md`](docs/secure-harness-react-mui.md)
-를 참고하세요.
+절차를 정리합니다. 구현된 보안 자동화·게이트 목록은 [`README.md`](README.md) "보안" 절을
+참고하세요.
 
 ## 위협 모델 (요약)
 

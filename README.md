@@ -23,14 +23,14 @@ React · TypeScript · Vite (SWC) · MUI · React Router · React Query · Axios
 ## Quick Start
 
 ```bash
-git clone https://github.com/<owner>/react-admin-template.git
+git clone https://github.com/lcgyung/react-admin-template.git
 cd react-admin-template
 pnpm install
 cp .env.example .env
 pnpm dev
 ```
 
-> 패키지 매니저는 **pnpm** 입니다.
+> 사전 요건: **Node ≥ 24**(`.nvmrc`) · 패키지 매니저는 **pnpm**(`pnpm@11.5.2`)입니다.
 
 기본값(`VITE_ENABLE_MOCK=true`)으로 MSW 목 API가 켜져 있어 백엔드 없이 바로 로그인할 수 있습니다.
 
@@ -54,9 +54,13 @@ pnpm lint             # 린트
 pnpm lint:fsd         # FSD 아키텍처 린트 (Steiger)
 pnpm format           # Prettier 포매팅
 pnpm gen:api          # OpenAPI 스펙 → API 타입 생성 (orval)
+pnpm gen:slice        # FSD 슬라이스 골격 생성 (plop)
 pnpm test             # 단위/컴포넌트 테스트 (Vitest)
+pnpm test:watch       # 테스트 watch 모드
+pnpm test:coverage    # 커버리지 측정 (임계값 vite.config.ts)
 pnpm test:e2e         # E2E 테스트 (Playwright)
 pnpm storybook        # Storybook (port 6006)
+pnpm build-storybook  # 정적 Storybook 빌드
 ```
 
 ## Environment
@@ -131,9 +135,8 @@ OpenAPI 문서로 교체하세요. 도메인 모델의 단일 출처는 `entitie
 - **보안 헤더 / CSP** — `nginx.conf`(정본)와 vite preview 에 실용 베이스라인 CSP +
   `X-Frame-Options`/`Referrer-Policy`/`Permissions-Policy`/`nosniff` 적용([ADR 0007](docs/adr/0007-security-headers-csp.md)).
 - **프로덕션 빌드** — `console`/`debugger` 제거(`vite.config.ts`). 오픈 리다이렉트는 `isInternalPath` 가드로 내부 경로만 허용.
-- 위협 모델·의도된 트레이드오프·취약점 신고 절차는 [`SECURITY.md`](SECURITY.md), 전체 점검표는
-  [`docs/secure-harness-react-mui.md`](docs/secure-harness-react-mui.md), 토큰 저장 트레이드오프는
-  [ADR 0005](docs/adr/0005-token-storage.md) 참고.
+- 위협 모델·의도된 트레이드오프·취약점 신고 절차는 [`SECURITY.md`](SECURITY.md), 토큰 저장
+  트레이드오프는 [ADR 0005](docs/adr/0005-token-storage.md) 참고.
 
 ## 배포
 
