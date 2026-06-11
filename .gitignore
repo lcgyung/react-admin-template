@@ -21,6 +21,9 @@ playwright-report
 /playwright/.cache
 blob-report
 
+# lighthouse ci (local run artifacts)
+.lighthouseci
+
 # logs
 *.log
 npm-debug.log*

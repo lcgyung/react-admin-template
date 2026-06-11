@@ -3,14 +3,33 @@ import path from 'node:path';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig } from 'vitest/config';
 
+// 보안 헤더(문서 응답). 호스팅 정본은 nginx.conf·vercel.json 이며, 여기 값은 로컬 dev/preview 용이다.
+const SECURITY_HEADERS = {
+  'X-Frame-Options': 'DENY',
+  'X-Content-Type-Options': 'nosniff',
+  'Referrer-Policy': 'no-referrer',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+};
+// 실용 베이스라인 CSP — style-src 'unsafe-inline' 은 emotion 런타임 스타일 대응(ADR 0007).
+// connect-src 는 통합 시 실제 API origin 으로 확장한다.
+const CONTENT_SECURITY_POLICY =
+  "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests";
+
 // https://vite.dev/config/
 export default defineConfig(({ command }) => ({
   plugins: [
     react(),
-    // 번들 분석 — build 시에만 dist/stats.html 생성(gitignore). dev/test 에서는 비활성.
-    command === 'build' &&
+    // 번들 분석 — `pnpm build:analyze`(ANALYZE=true) 일 때만 dist/stats.html 생성(gitignore).
+    // 일반 build/dev/test 에서는 비활성(매 빌드 산출물 오염 방지).
+    process.env.ANALYZE === 'true' &&
       visualizer({ filename: 'dist/stats.html', gzipSize: true, brotliSize: true }),
   ],
+  // dev 서버: CSP 는 HMR(websocket·eval)과 충돌하므로 제외하고 나머지 보안 헤더만 적용.
+  server: { headers: SECURITY_HEADERS },
+  // preview(빌드 산출물): 프로덕션과 동일하게 CSP 포함 전체 헤더 적용.
+  preview: { headers: { ...SECURITY_HEADERS, 'Content-Security-Policy': CONTENT_SECURITY_POLICY } },
+  // 프로덕션 번들에서 console/debugger 제거 — 정보 노출·디버그 흔적 차단(dev/test 는 유지).
+  esbuild: { drop: command === 'build' ? ['console', 'debugger'] : [] },
   resolve: {
     alias: {
       '@': path.resolve(import.meta.dirname, './src'),

@@ -21,8 +21,9 @@
 - [ ] 🔴 Vitest + React Testing Library
 - [ ] 🔴 MSW — API 모킹 (백엔드 없이 개발·테스트)
 - [ ] 🟡 E2E (Playwright)
+- [ ] 🟡 Lighthouse CI — 접근성·SEO·모범사례 점수 임계값 게이트 (a11y/best-practices/seo 0.9, performance warn)
 - [ ] 🟡 watch 모드 (HMR + test watch)
-- [ ] 🟢 번들 분석 (rollup-plugin-visualizer)
+- [ ] 🟢 번들 분석 (rollup-plugin-visualizer, `pnpm build:analyze`)
 
 ## 3. 디자인 시스템 (MUI)
 

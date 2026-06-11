@@ -1,0 +1,37 @@
+name: CodeQL
+
+# SAST(정적 보안 분석) 게이트 — JS/TS 소스를 CodeQL 로 스캔한다.
+# 시크릿 불필요(퍼블릭 리포 무료). 결과는 Security 탭(code scanning alerts)에 보고된다.
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+  schedule:
+    # 주1회 정기 스캔(의존성·신규 룰 반영). 월요일 03:17 UTC.
+    - cron: '17 3 * * 1'
+
+jobs:
+  analyze:
+    name: Analyze (javascript-typescript)
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript
+          # 보안 + 품질 쿼리 묶음.
+          queries: security-and-quality
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: '/language:javascript-typescript'

@@ -1,9 +1,11 @@
 import js from '@eslint/js';
 import prettier from 'eslint-config-prettier';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
+import noUnsanitized from 'eslint-plugin-no-unsanitized';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
+import security from 'eslint-plugin-security';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import storybook from 'eslint-plugin-storybook';
 import globals from 'globals';
@@ -107,5 +109,21 @@ export default tseslint.config(
   },
   jsxA11y.flatConfigs.recommended,
   ...storybook.configs['flat/recommended'],
+  // DOM XSS 정적 차단 — innerHTML/insertAdjacentHTML 등 비살균 sink 에 비literal 전달 시 error.
+  noUnsanitized.configs.recommended,
+  // 시큐어 코딩 정적 점검(eslint-plugin-security). 룰 기본 severity 는 warn.
+  security.configs.recommended,
+  {
+    rules: {
+      // no-unsanitized 는 명시적으로 error 로 하드 고정(권장셋이 error 지만 의도를 코드로 남긴다).
+      'no-unsanitized/method': 'error',
+      'no-unsanitized/property': 'error',
+      // 프론트(브라우저) 코드에서 false positive 가 큰 두 룰은 비활성:
+      // - detect-object-injection: 모든 obj[var] 접근에 발화(노이즈).
+      // - detect-possible-timing-attacks: 목 로그인의 password 비교 등에 오탐(실인증은 백엔드 몫).
+      'security/detect-object-injection': 'off',
+      'security/detect-possible-timing-attacks': 'off',
+    },
+  },
   prettier,
 );

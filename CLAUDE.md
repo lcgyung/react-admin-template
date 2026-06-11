@@ -134,6 +134,13 @@ src
 - **접근성(a11y)** — `eslint-plugin-jsx-a11y` recommended를 강제합니다. 인터랙티브 요소의
   label/aria/role·키보드 접근 위반은 린트에서 막힙니다.
 - **ESLint + Prettier** — 모든 코드는 린트/포매팅 규칙을 통과해야 합니다 (`pnpm lint`, `pnpm format`).
+- **보안 정적 분석** — `eslint-plugin-no-unsanitized`가 `dangerouslySetInnerHTML`·`innerHTML` 등
+  DOM XSS sink를 **error로 차단**합니다(불가피하면 DOMPurify). `eslint-plugin-security`도 켜져 있고,
+  CI는 CodeQL(SAST)·dist 시크릿 스캔을 추가로 돌립니다. 리다이렉트 대상은 `@/shared/lib/url`의
+  `isInternalPath`/`resolveInternalRedirect`로 내부 경로만 허용합니다(오픈 리다이렉트 방지).
+  CSP·보안 헤더 정본은 `nginx.conf`·`vercel.json`(로컬은 `vite.config.ts` preview)이며
+  [ADR 0007](docs/adr/0007-security-headers-csp.md) 참고. 보안 점검표는
+  [`docs/secure-harness-react-mui.md`](docs/secure-harness-react-mui.md)에 있습니다.
 - **테스트 커버리지(ratchet)** — `pnpm test:coverage`(v8)가 `vite.config.ts`의 임계값을 강제하고
   CI의 test 스텝이 이를 사용합니다. 현재 베이스라인 아래로 고정돼 있고, 테스트를 추가하며 PR마다
   임계값을 점진 상향합니다. (Stop 게이트의 `vitest run`은 속도를 위해 coverage 미포함.)

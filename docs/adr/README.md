@@ -12,5 +12,6 @@
 | [0004](0004-api-types-orval.md)               | API 타입 — orval + 샘플 스펙        | Accepted |
 | [0005](0005-token-storage.md)                 | 토큰 저장 — localStorage persist    | Accepted |
 | [0006](0006-observability.md)                 | 관찰가능성 — Sentry/Web Vitals 스텁 | Accepted |
+| [0007](0007-security-headers-csp.md)          | 보안 헤더 & CSP — 실용 베이스라인   | Accepted |
 
 새 결정은 다음 번호로 파일을 추가하고 이 표에 한 줄 등록한다.

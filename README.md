@@ -46,7 +46,8 @@ pnpm dev
 
 ```bash
 pnpm dev              # 개발 서버
-pnpm build            # 프로덕션 빌드 (타입체크 포함 + dist/stats.html 번들 분석)
+pnpm build            # 프로덕션 빌드 (타입체크 포함)
+pnpm build:analyze    # 빌드 + 번들 분석 (ANALYZE=true → dist/stats.html)
 pnpm preview          # 빌드 미리보기
 pnpm typecheck        # 타입체크 단독 (tsc -b --noEmit)
 pnpm lint             # 린트
@@ -111,6 +112,8 @@ OpenAPI 문서로 교체하세요. 도메인 모델의 단일 출처는 `entitie
   `vite.config.ts`에서 강제하며 CI가 검증합니다.
 - **E2E** — `pnpm test:e2e` (Playwright). 프로덕션 빌드를 preview 서버로 띄워 로그인 흐름을 검증합니다.
   최초 1회 브라우저 설치 필요: `pnpm exec playwright install --with-deps chromium`.
+- **Lighthouse CI** — CI 에서 빌드 산출물(dist)을 정적 서빙해 접근성·SEO·모범사례(각 0.9)를 차단 게이트로,
+  성능은 warn 으로 점검합니다(임계값 정본 `lighthouserc.json`). 로컬: `pnpm build && pnpm exec lhci autorun`.
 
 ## 관찰가능성
 
@@ -121,9 +124,16 @@ OpenAPI 문서로 교체하세요. 도메인 모델의 단일 출처는 `entitie
 
 ## 보안
 
-- **시크릿 스캔** — gitleaks (pre-commit + CI). 프론트 번들 시크릿 유출에 특히 주의합니다.
-- **의존성** — `pnpm audit`(CI, high 차단) + Dependabot 주간 업데이트(`.github/dependabot.yml`).
-- 토큰 저장 전략과 보안 트레이드오프는 [ADR 0005](docs/adr/0005-token-storage.md) 참고.
+- **정적 분석** — `eslint-plugin-security` + `eslint-plugin-no-unsanitized`(DOM XSS sink 차단) +
+  CodeQL SAST(`.github/workflows/codeql.yml`).
+- **시크릿 스캔** — gitleaks (pre-commit + CI) + 빌드 산출물(dist) 시크릿 스캔. 프론트 번들 시크릿 유출에 특히 주의합니다.
+- **의존성** — `pnpm audit`(CI, high 차단, `--prod`) + osv-scanner(교차검증, 비차단) + Dependabot 주간 업데이트(`.github/dependabot.yml`).
+- **보안 헤더 / CSP** — `nginx.conf`·`vercel.json`(정본)과 vite preview 에 실용 베이스라인 CSP +
+  `X-Frame-Options`/`Referrer-Policy`/`Permissions-Policy`/`nosniff` 적용([ADR 0007](docs/adr/0007-security-headers-csp.md)).
+- **프로덕션 빌드** — `console`/`debugger` 제거(`vite.config.ts`). 오픈 리다이렉트는 `isInternalPath` 가드로 내부 경로만 허용.
+- 위협 모델·의도된 트레이드오프·취약점 신고 절차는 [`SECURITY.md`](SECURITY.md), 전체 점검표는
+  [`docs/secure-harness-react-mui.md`](docs/secure-harness-react-mui.md), 토큰 저장 트레이드오프는
+  [ADR 0005](docs/adr/0005-token-storage.md) 참고.
 
 ## 배포 (프리뷰)
 

@@ -26,4 +26,7 @@
 ## 결과
 
 - DSN 만 설정하면 에러 트래킹이 켜진다. 미설정 시 비용 0.
-- 운영 전 권장: 소스맵 비공개 업로드, PII 스크러빙, `tracesSampleRate` 조정.
+- 기본 PII 스크러빙 적용: `Sentry.init` 의 `sendDefaultPii: false` + `beforeSend` 로 쿠키·요청 헤더·
+  `user` 를 전송 전 제거한다(`shared/lib/observability/sentry.ts`).
+- 운영 전 권장(통합자 책임): 소스맵 **비공개** 업로드(SENTRY_AUTH_TOKEN 필요), `tracesSampleRate`
+  조정, 필요 시 `beforeSend` 스크러빙 범위 확장.
