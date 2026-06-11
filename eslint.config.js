@@ -11,7 +11,14 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {
-    ignores: ['dist', 'storybook-static', 'coverage', 'public/mockServiceWorker.js'],
+    ignores: [
+      'dist',
+      'storybook-static',
+      'coverage',
+      'public/mockServiceWorker.js',
+      // orval 생성물 — import 정렬·네이밍 규칙 비대상.
+      'src/shared/api/generated',
+    ],
   },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
@@ -81,7 +88,22 @@ export default tseslint.config(
         { selector: 'objectLiteralProperty', format: null },
         { selector: 'import', format: null },
       ],
+      // 색상 하드코딩 금지(권장) — sx/styled 등에서 #hex 리터럴 사용 시 theme 토큰 사용을 유도한다.
+      // 단일 소스인 features/theme/model/tokens.ts·스토리는 아래 override 로 예외. 게이트 차단 방지 위해 warn.
+      'no-restricted-syntax': [
+        'warn',
+        {
+          selector: 'Literal[value=/^#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/]',
+          message:
+            '색상은 theme 토큰을 사용하세요(하드코딩 #hex 금지). features/theme 의 토큰을 참고하세요.',
+        },
+      ],
     },
+  },
+  {
+    // 테마 토큰 단일 소스와 스토리는 색상 하드코딩 규칙 예외.
+    files: ['src/features/theme/model/tokens.ts', '**/*.stories.tsx'],
+    rules: { 'no-restricted-syntax': 'off' },
   },
   jsxA11y.flatConfigs.recommended,
   ...storybook.configs['flat/recommended'],

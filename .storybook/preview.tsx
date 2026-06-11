@@ -1,7 +1,9 @@
-import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
+import { CssBaseline, ThemeProvider } from '@mui/material';
 import type { Preview } from '@storybook/react';
 
-const theme = createTheme();
+import { createAppTheme } from '@/features/theme';
+
+const theme = createAppTheme('light');
 
 const preview: Preview = {
   parameters: {

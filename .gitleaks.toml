@@ -1,0 +1,13 @@
+title = "gitleaks config — react-admin-template"
+
+# 기본 룰셋을 확장한다. 프론트는 번들에 들어간 시크릿이 그대로 노출되므로 특히 주의한다.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "예시·문서·목 데이터는 시크릿 스캔에서 제외(실제 시크릿 아님)"
+paths = [
+  '''\.env\.example''',
+  '''(^|/)docs/''',
+  '''(^|/)src/app/mocks/''',
+]

@@ -4,7 +4,7 @@ React + TypeScript + Vite 기반 관리자 템플릿. MUI, React Query, Zustand,
 
 ## Stack
 
-React · TypeScript · Vite · MUI · React Router · React Query · Axios · Zustand · React Hook Form · Zod · Dayjs · MSW · Vitest · ESLint · Prettier · Husky · Storybook
+React · TypeScript · Vite (SWC) · MUI · React Router · React Query · Axios · Zustand · React Hook Form · Zod · Dayjs · MSW · orval · Vitest · Playwright · ESLint · Prettier · Husky · Storybook · Sentry/Web Vitals
 
 ## Features
 
@@ -46,11 +46,15 @@ pnpm dev
 
 ```bash
 pnpm dev              # 개발 서버
-pnpm build            # 프로덕션 빌드 (타입체크 포함)
+pnpm build            # 프로덕션 빌드 (타입체크 포함 + dist/stats.html 번들 분석)
 pnpm preview          # 빌드 미리보기
+pnpm typecheck        # 타입체크 단독 (tsc -b --noEmit)
 pnpm lint             # 린트
 pnpm lint:fsd         # FSD 아키텍처 린트 (Steiger)
-pnpm test             # 테스트
+pnpm format           # Prettier 포매팅
+pnpm gen:api          # OpenAPI 스펙 → API 타입 생성 (orval)
+pnpm test             # 단위/컴포넌트 테스트 (Vitest)
+pnpm test:e2e         # E2E 테스트 (Playwright)
 pnpm storybook        # Storybook (port 6006)
 ```
 
@@ -59,9 +63,12 @@ pnpm storybook        # Storybook (port 6006)
 ```env
 VITE_API_BASE_URL=http://localhost:3000
 VITE_ENABLE_MOCK=true   # MSW 목 API. 실제 백엔드 연동 시 false
+# VITE_SENTRY_DSN=      # 설정 시에만 Sentry 에러 트래킹 활성화 (미설정 시 no-op)
 ```
 
 `.env.development` / `.env.production`으로 모드별 분리. 값은 `.env.example` 참고.
+모든 `VITE_` 변수는 클라이언트 번들에 **그대로 노출**되므로 시크릿을 넣지 마세요. 환경변수는
+부팅 시 zod 스키마(`src/shared/config/env.ts`)로 검증되어, 형식 오류 시 즉시 실패합니다.
 
 ## Structure
 
@@ -90,6 +97,42 @@ export const getUsers = async () => {
 
 요청·응답 인터셉터로 토큰 주입과 401 리다이렉트를 처리합니다(인증 콜백은 `app/config/configureApi.ts`
 에서 주입). 컴포넌트는 axios를 직접 호출하지 않고 `features/*`의 React Query 훅을 거칩니다.
+
+## API 타입 생성 (orval)
+
+`openapi/admin-api.yaml`(샘플 OpenAPI 스펙)에서 `pnpm gen:api`로 API 타입과 타입 클라이언트를
+`src/shared/api/generated/`에 생성합니다(생성물 커밋). 실제 백엔드 연동 시 이 스펙을 백엔드가 제공하는
+OpenAPI 문서로 교체하세요. 도메인 모델의 단일 출처는 `entities/user`이며 생성 타입은 전송 경계에서
+소비합니다. [ADR 0004](docs/adr/0004-api-types-orval.md) 참고.
+
+## 테스트
+
+- **단위/컴포넌트** — `pnpm test` (Vitest + Testing Library, jsdom + MSW). 커버리지 임계값을
+  `vite.config.ts`에서 강제하며 CI가 검증합니다.
+- **E2E** — `pnpm test:e2e` (Playwright). 프로덕션 빌드를 preview 서버로 띄워 로그인 흐름을 검증합니다.
+  최초 1회 브라우저 설치 필요: `pnpm exec playwright install --with-deps chromium`.
+
+## 관찰가능성
+
+`src/shared/lib/observability`에 에러 트래킹(Sentry)·웹 바이탈 수집이 env-gated 스텁으로 들어 있습니다.
+`VITE_SENTRY_DSN`을 설정하면 `@sentry/react`가 동적 로드되어 활성화됩니다(미설정 시 no-op). 렌더 에러는
+앱 루트 `ErrorBoundary`가 잡아 폴백 UI를 보여주고 `reportError`로 보고합니다.
+[ADR 0006](docs/adr/0006-observability.md) 참고.
+
+## 보안
+
+- **시크릿 스캔** — gitleaks (pre-commit + CI). 프론트 번들 시크릿 유출에 특히 주의합니다.
+- **의존성** — `pnpm audit`(CI, high 차단) + Dependabot 주간 업데이트(`.github/dependabot.yml`).
+- 토큰 저장 전략과 보안 트레이드오프는 [ADR 0005](docs/adr/0005-token-storage.md) 참고.
+
+## 배포 (프리뷰)
+
+`vercel.json`이 SPA 빌드/리라이트를 설정합니다. 저장소를 Vercel에 연결하면 PR마다 프리뷰 배포가
+자동 생성됩니다. 다른 호스팅(Netlify/Cloudflare Pages 등)도 `pnpm build` → `dist` 정적 서빙으로 동일하게 동작합니다.
+
+## 아키텍처 결정 기록 (ADR)
+
+상태 관리·FSD·API 타입·토큰 저장·관찰가능성 등 주요 결정의 배경은 [docs/adr/](docs/adr/)에 기록합니다.
 
 ## Contributing
 
