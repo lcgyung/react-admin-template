@@ -3,8 +3,8 @@ import { execSync } from 'node:child_process';
 /**
  * FSD 슬라이스 골격 제너레이터.
  *
- * `pnpm gen:slice` 로 feature/entity 슬라이스를 정본 골격대로 생성한다(CLAUDE.md "슬라이스 파일
- * 구현 골격" 과 1:1). 생성물은 ESLint 구조 규칙(queryKey 상수 객체·named export·axios 격리)을
+ * `pnpm gen:slice` 로 feature/entity 슬라이스를 정본 골격대로 생성한다
+ * (`.claude/rules/slice-blueprint.md` 와 1:1). 생성물은 ESLint 구조 규칙(queryKey 상수 객체·named export·axios 격리)을
  * 통과하도록 작성돼 있다. plop 은 Write 툴이 아니라 PostToolUse 포맷 훅이 걸리지 않으므로,
  * 생성 직후 prettier/eslint --fix 를 직접 적용한다.
  *
