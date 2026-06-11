@@ -9,6 +9,12 @@ if printf '%s' "$INPUT" | jq -e '.stop_hook_active == true' >/dev/null 2>&1; the
   exit 0
 fi
 
+# plan mode: 편집 금지 모드라 변경분이 없음 — 풀 게이트 스킵.
+# 필드가 없거나 파싱 실패면 검사하는 쪽(풀 게이트)으로 폴백.
+if printf '%s' "$INPUT" | jq -e '.permission_mode == "plan"' >/dev/null 2>&1; then
+  exit 0
+fi
+
 # 훅은 Claude의 cwd(하위 디렉터리일 수 있음)를 상속하므로 repo 루트로 이동.
 # (tsc -b / eslint . / vitest / steiger 가 cwd=루트를 전제하므로 필수)
 cd "${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null)}" || exit 1
