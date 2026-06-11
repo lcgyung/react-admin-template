@@ -5,10 +5,10 @@ import { paths } from '@/shared/config';
 
 export const ForbiddenPage = () => (
   <Box sx={{ textAlign: 'center', py: 8 }}>
-    <Typography variant="h2" fontWeight={700}>
+    <Typography variant="h2" sx={{ fontWeight: 700 }}>
       403
     </Typography>
-    <Typography color="text.secondary" mb={3}>
+    <Typography color="text.secondary" sx={{ mb: 3 }}>
       이 페이지에 접근할 권한이 없습니다.
     </Typography>
     <Button component={Link} to={paths.dashboard} variant="contained">

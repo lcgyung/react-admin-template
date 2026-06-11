@@ -15,7 +15,7 @@ export const ErrorFallback = ({ onReset }: ErrorFallbackProps) => (
       p: 3,
     }}
   >
-    <Stack spacing={2} alignItems="center" textAlign="center">
+    <Stack spacing={2} sx={{ alignItems: 'center', textAlign: 'center' }}>
       <Typography variant="h2">문제가 발생했습니다</Typography>
       <Typography color="text.secondary">
         화면을 표시하는 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.

@@ -14,7 +14,7 @@ export const NotFoundPage = () => (
       gap: 2,
     }}
   >
-    <Typography variant="h2" fontWeight={700}>
+    <Typography variant="h2" sx={{ fontWeight: 700 }}>
       404
     </Typography>
     <Typography color="text.secondary">페이지를 찾을 수 없습니다.</Typography>
