@@ -116,22 +116,32 @@ src
 - **타입 안정성 우선** — TypeScript 타입을 명확히 지정하고 `any` 사용을 지양합니다.
   `tsconfig`에 `strict`, `noUnusedLocals/Parameters`가 켜져 있습니다.
 - **최소 보일러플레이트** — 불필요한 추상화를 피하고 간결하게 작성합니다.
-- **네이밍** — 컴포넌트/타입 `PascalCase`, 훅 `use*`, 함수/변수 `camelCase`, 모듈 상수 `UPPER_CASE`.
-  `@typescript-eslint/naming-convention`이 `warn`으로 강제합니다.
-- **import 정렬** — `simple-import-sort`가 `side-effect → 외부 → @/ 레이어(app→shared) → 상대경로`
-  순으로 자동 정렬합니다. 수동으로 맞추지 말고 `--fix`에 맡깁니다.
+- **컴포넌트 선언은 화살표 함수** — `react/function-component-definition`이 `const X = () => …`를
+  강제합니다(autofix). `default export`는 쓰지 않고 named export로 통일합니다. props는
+  `interface NameProps`(PascalCase)로 정의합니다.
+- **네이밍** — 컴포넌트/타입 `PascalCase`, 훅 `use*`, 함수/변수 `camelCase`, 모듈 상수 `UPPER_CASE`,
+  상수 객체(queryKeys 등) `camelCase`. `@typescript-eslint/naming-convention`이 `warn`으로 노출합니다.
+- **import 정렬(자동)** — `simple-import-sort`가 `side-effect → 외부 → @/ 레이어(app→shared) → 상대경로`
+  순으로 자동 정렬합니다. 수동으로 맞추지 말고 `--fix`에 맡깁니다. 단, side-effect import
+  (`import '@/app/config/configureApi'`)는 정렬 장벽으로 위치가 보존됩니다.
 - **queryKey는 객체 패턴** — React Query 키는 `userKeys`/`authKeys` 같은 상수 객체로 관리하고,
   배열 리터럴을 하드코딩하지 않습니다.
 - **enum 단일 출처** — `Role` 등 도메인 값은 `entities`의 `ROLES`(`entities/user`)를 단일 출처로
   재사용합니다(`z.enum(ROLES)`). 문자열 배열 중복 정의 금지.
-- **ESLint + Prettier + a11y** — 모든 코드는 린트/포매팅 규칙을 통과해야 합니다 (`pnpm lint`, `pnpm format`).
-  `eslint-plugin-jsx-a11y`가 접근성을 1차 점검합니다.
+- **MUI 스타일** — 색·간격·타이포는 theme 토큰(`sx`/`styled`, `theme.spacing()`)을 사용하고
+  하드코딩 `#hex`/`px`를 지양합니다. 인라인 `style` 대신 `sx`를 쓰고, `sx`에 매 렌더 새 객체를
+  남발하지 않습니다(불필요한 리렌더 방지).
+- **접근성(a11y)** — `eslint-plugin-jsx-a11y` recommended를 강제합니다. 인터랙티브 요소의
+  label/aria/role·키보드 접근 위반은 린트에서 막힙니다.
+- **ESLint + Prettier** — 모든 코드는 린트/포매팅 규칙을 통과해야 합니다 (`pnpm lint`, `pnpm format`).
+- **테스트 커버리지(ratchet)** — `pnpm test:coverage`(v8)가 `vite.config.ts`의 임계값을 강제하고
+  CI의 test 스텝이 이를 사용합니다. 현재 베이스라인 아래로 고정돼 있고, 테스트를 추가하며 PR마다
+  임계값을 점진 상향합니다. (Stop 게이트의 `vitest run`은 속도를 위해 coverage 미포함.)
+- **JSDoc 범위** — JSDoc/주석은 공개 API(배럴로 노출되는 함수·훅)와 비자명한 로직·함정(gotcha)에
+  한정합니다(예: `shared/api/axiosInstance.ts`의 인증 브리지 주석). 자명한 컴포넌트엔 생략합니다.
 - **Husky + Lint-Staged** — 커밋 시 변경 파일에 자동으로 `eslint --fix` + `prettier`가 적용되고,
   `commit-msg` 훅의 commitlint가 Conventional Commits 형식을 강제합니다. `.editorconfig`로 에디터
   기본값(lf·2 space)을 통일합니다.
-
-> 컴포넌트 선언·props·import·queryKey·Zod·MUI 스타일 등 **전체 스타일 규칙**은
-> [`docs/STYLE_GUIDE.md`](docs/STYLE_GUIDE.md) 참고.
 
 ## Claude Code 자동화 (`.claude/`)
 
@@ -140,5 +150,5 @@ src
 - **SessionStart** → `session-context.sh`: 브랜치 등 컨텍스트를 주입.
 - **PreToolUse(Bash)** → `guard-bash.sh`: 파괴적 명령(`rm -rf /`, force push, `reset --hard` 등)을 차단.
 - **PostToolUse(Edit/Write)** → `format-changed-file.sh`: 변경된 `*.ts(x)` 에 `eslint --fix` + `prettier` 자동 적용.
-- **Stop** → `gate.sh`: 세션 종료 전 `tsc -b --noEmit` + `eslint .` + `steiger ./src`(FSD) + `vitest run` 게이트. 실패하면 `exit 2` 로 계속 수정을 유도한다. `stop_hook_active` 무한루프 가드 포함.
+- **Stop** → `gate.sh`: 세션 종료 전 `tsc -b --noEmit` + `eslint .` + `prettier --check .` + `steiger ./src`(FSD) + `vitest run` 게이트. 실패하면 `exit 2` 로 계속 수정을 유도한다. `stop_hook_active` 무한루프 가드 포함.
 - `.claude/agents/code-reviewer.md`, `.claude/skills/code-review/` 가 함께 제공된다.

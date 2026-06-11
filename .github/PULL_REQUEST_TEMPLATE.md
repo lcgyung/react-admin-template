@@ -44,4 +44,4 @@
 - [ ] 빌드 통과 (`pnpm build`)
 - [ ] 커밋 메시지 Conventional Commits 준수
 
-> 상세 기준: [`docs/STYLE_GUIDE.md`](../docs/STYLE_GUIDE.md)
+> 상세 기준: [`CLAUDE.md`](../CLAUDE.md)의 "코드 컨벤션" 섹션
