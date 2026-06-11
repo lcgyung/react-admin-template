@@ -71,7 +71,8 @@ src
 ## 아키텍처 / 상태 관리 규칙
 
 - **서버 상태** → React Query. 컴포넌트에서 직접 `axios`를 호출하지 말고 `features/*`의
-  React Query 훅(`useAuth`, `useUsers`)을 거칩니다.
+  React Query 훅(`useAuth`, `useUsers`)을 거칩니다. `no-restricted-imports`가 `api/` 세그먼트 밖에서
+  `axiosInstance` import를 **error로 차단**합니다.
 - **API 호출** → `features/*/api`의 Axios 레이어 함수로 정의(슬라이스 내부용, 배럴 미노출).
   `shared/api`의 `axiosInstance`가 요청 인터셉터로 토큰을 주입하고, 응답 인터셉터로 401 시
   인증 상태를 초기화하고 `/login`으로 보냅니다.
@@ -93,6 +94,73 @@ src
 - **폼 / 검증** → React Hook Form + Zod. 스키마는 해당 feature의 `model` 세그먼트에 정의하고
   (`features/auth/model/loginSchema.ts`, `features/users/model/userFormSchema.ts`)
   `zodResolver`로 연결합니다.
+
+## 슬라이스 파일 구현 골격 (새 슬라이스 작성 규약)
+
+폴더/레이어 구조는 `steiger`가 강제하지만, **슬라이스 내부 파일을 어떻게 채우는가**는 아래 골격을
+정본으로 통일합니다. 새 슬라이스는 **`pnpm gen:slice`** 로 생성하면 이 골격대로 스캐폴딩됩니다(수기
+작성 시에도 동일 골격을 따릅니다). 🔒 표시 항목은 ESLint가 **error로 하드 강제**합니다(게이트·CI 차단).
+
+### feature 슬라이스 (`src/features/<name>/`)
+
+정본: `src/features/users/`.
+
+- `index.ts` (Public API 배럴) — 스키마 타입·스키마·훅·keys 만 export. **api 함수는 노출 금지.**
+
+  ```ts
+  export type { UserFormValues } from './model/userFormSchema';
+  export { userFormSchema } from './model/userFormSchema';
+  export { useCreateUser, userKeys, useUser, useUsers } from './model/useUsers';
+  ```
+
+- `api/<name>Api.ts` — raw axios named async 함수. 🔒 `axiosInstance`는 `api/` 세그먼트에서만 import.
+
+  ```ts
+  export const getUsers = async () => {
+    const { data } = await axiosInstance.get<User[]>('/users');
+    return data;
+  };
+  ```
+
+- `model/<name>Schema.ts` — zod 스키마 + `z.infer` 추론 타입. 도메인 값은 `ROLES` 등 단일소스 재사용.
+
+  ```ts
+  export const userFormSchema = z.object({ name: z.string().min(1), role: z.enum(ROLES) });
+  export type UserFormValues = z.infer<typeof userFormSchema>;
+  ```
+
+- `model/use<Name>.ts` — 맨 위 `keys` 상수 객체, 아래 훅이 `queryKey: <keys>.*` 참조.
+  🔒 queryKey 배열 리터럴 금지(상수 객체만).
+
+  ```ts
+  export const userKeys = {
+    all: ['users'] as const,
+    detail: (id: number) => ['users', id] as const,
+  };
+  export const useUsers = () => useQuery({ queryKey: userKeys.all, queryFn: getUsers });
+  ```
+
+### entity 슬라이스 (`src/entities/<name>/`)
+
+정본: `src/entities/user/`.
+
+- `index.ts` — 도메인 타입·상수·헬퍼만 export.
+- `model/types.ts` — 도메인 타입 + `ROLES` 류 단일소스 상수(`as const`).
+- `@x/<other>.ts` — 다른 entity에 타입을 노출하는 크로스임포트(예: `entities/user/@x/session`).
+
+### shared (`src/shared/<segment>/`)
+
+세그먼트 배럴로만 노출: `@/shared/api`, `@/shared/config`, `@/shared/ui/<Name>`, `@/shared/lib/<name>`.
+
+### 새 슬라이스 체크리스트
+
+1. `pnpm gen:slice` 로 생성(layer·이름 입력) — 골격 자동 스캐폴딩(생성물에 `eslint --fix`+prettier 자동 적용).
+   생성 직후엔 미참조라 `steiger`가 `fsd/insignificant-slice`로 막으니, 상위(페이지 등)에서 import해 연결해야 게이트가 통과한다.
+2. 배럴(`index.ts`)은 스키마·훅·keys 만 노출(api 함수 제외). 🔒(steiger: 배럴 경유 강제)
+3. queryKey 는 `keys` 상수 객체. 🔒
+4. `axiosInstance` 호출은 `api/` 세그먼트에만. 🔒
+5. export 는 named only(default export 금지). 🔒
+6. 폼 스키마는 `model/*Schema.ts` 에 zod로, `z.infer` 로 타입 추론.
 
 ## 인증 & RBAC
 
@@ -117,20 +185,21 @@ src
   `tsconfig`에 `strict`, `noUnusedLocals/Parameters`가 켜져 있습니다.
 - **최소 보일러플레이트** — 불필요한 추상화를 피하고 간결하게 작성합니다.
 - **컴포넌트 선언은 화살표 함수** — `react/function-component-definition`이 `const X = () => …`를
-  강제합니다(autofix). `default export`는 쓰지 않고 named export로 통일합니다. props는
-  `interface NameProps`(PascalCase)로 정의합니다.
+  강제합니다(autofix). `default export`는 쓰지 않고 named export로 통일합니다(`local/no-default-export`가
+  **error로 차단** — Storybook meta·`*.config.ts`는 예외). props는 `interface NameProps`(PascalCase)로 정의합니다.
 - **네이밍** — 컴포넌트/타입 `PascalCase`, 훅 `use*`, 함수/변수 `camelCase`, 모듈 상수 `UPPER_CASE`,
-  상수 객체(queryKeys 등) `camelCase`. `@typescript-eslint/naming-convention`이 `warn`으로 노출합니다.
+  상수 객체(queryKeys 등) `camelCase`. `@typescript-eslint/naming-convention`이 **error로 강제**합니다
+  (객체 리터럴 키·import 별칭은 false positive 방지로 미강제).
 - **import 정렬(자동)** — `simple-import-sort`가 `side-effect → 외부 → @/ 레이어(app→shared) → 상대경로`
   순으로 자동 정렬합니다. 수동으로 맞추지 말고 `--fix`에 맡깁니다. 단, side-effect import
   (`import '@/app/config/configureApi'`)는 정렬 장벽으로 위치가 보존됩니다.
 - **queryKey는 객체 패턴** — React Query 키는 `userKeys`/`authKeys` 같은 상수 객체로 관리하고,
-  배열 리터럴을 하드코딩하지 않습니다.
+  배열 리터럴을 하드코딩하지 않습니다. `local/query-key-object`가 `queryKey: [...]` 리터럴을 **error로 차단**합니다.
 - **enum 단일 출처** — `Role` 등 도메인 값은 `entities`의 `ROLES`(`entities/user`)를 단일 출처로
   재사용합니다(`z.enum(ROLES)`). 문자열 배열 중복 정의 금지.
-- **MUI 스타일** — 색·간격·타이포는 theme 토큰(`sx`/`styled`, `theme.spacing()`)을 사용하고
-  하드코딩 `#hex`/`px`를 지양합니다. 인라인 `style` 대신 `sx`를 쓰고, `sx`에 매 렌더 새 객체를
-  남발하지 않습니다(불필요한 리렌더 방지).
+- **MUI 스타일** — 색·간격·타이포는 theme 토큰(`sx`/`styled`, `theme.spacing()`)을 사용합니다.
+  하드코딩 `#hex`는 `no-restricted-syntax`가 **error로 차단**합니다(theme 토큰 단일소스·스토리는 예외).
+  `px`는 권장 차원. 인라인 `style` 대신 `sx`를 쓰고, `sx`에 매 렌더 새 객체를 남발하지 않습니다(불필요한 리렌더 방지).
 - **접근성(a11y)** — `eslint-plugin-jsx-a11y` recommended를 강제합니다. 인터랙티브 요소의
   label/aria/role·키보드 접근 위반은 린트에서 막힙니다.
 - **ESLint + Prettier** — 모든 코드는 린트/포매팅 규칙을 통과해야 합니다 (`pnpm lint`, `pnpm format`).

@@ -1,0 +1,25 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
+import { create{{pascalCase name}}, get{{pascalCase name}}List } from '../api/{{camelCase name}}Api';
+import type { {{pascalCase name}}FormValues } from './{{camelCase name}}Schema';
+
+export const {{camelCase name}}Keys = {
+  all: ['{{dashCase name}}'] as const,
+};
+
+export const use{{pascalCase name}}List = () =>
+  useQuery({
+    queryKey: {{camelCase name}}Keys.all,
+    queryFn: get{{pascalCase name}}List,
+  });
+
+export const useCreate{{pascalCase name}} = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: {{pascalCase name}}FormValues) => create{{pascalCase name}}(input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: {{camelCase name}}Keys.all });
+    },
+  });
+};

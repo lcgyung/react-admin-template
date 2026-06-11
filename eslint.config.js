@@ -11,6 +11,43 @@ import storybook from 'eslint-plugin-storybook';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
+// 프로젝트 고유 "파일 구현" 구조 규칙 — 외부 의존성 없이 flat config 안의 로컬 플러그인으로 정의한다.
+// no-restricted-syntax(색상)와 severity 를 공유하지 않으려고(룰 키 충돌 회피) 별도 플러그인으로 분리.
+const local = {
+  rules: {
+    // queryKey 배열 리터럴 금지 → userKeys/authKeys 같은 상수 객체를 강제(중복 키·무효화 누락 방지).
+    'query-key-object': {
+      meta: {
+        type: 'problem',
+        docs: { description: 'queryKey 는 상수 객체로 관리한다(배열 리터럴 금지)' },
+        schema: [],
+      },
+      create: (context) => ({
+        "Property[key.name='queryKey'] > ArrayExpression": (node) => {
+          context.report({
+            node,
+            message:
+              'queryKey 는 userKeys/authKeys 같은 상수 객체로 관리하세요(배열 리터럴 하드코딩 금지).',
+          });
+        },
+      }),
+    },
+    // default export 금지 → named export 통일. 스토리·설정 파일(Storybook meta·vite.config 등)은 아래 override 로 예외.
+    'no-default-export': {
+      meta: {
+        type: 'problem',
+        docs: { description: 'default export 금지(named export 통일)' },
+        schema: [],
+      },
+      create: (context) => ({
+        ExportDefaultDeclaration: (node) => {
+          context.report({ node, message: 'default export 금지 — named export 를 사용하세요.' });
+        },
+      }),
+    },
+  },
+};
+
 export default tseslint.config(
   {
     ignores: [
@@ -36,6 +73,7 @@ export default tseslint.config(
       'react-refresh': reactRefresh,
       'simple-import-sort': simpleImportSort,
       react,
+      local,
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
@@ -71,9 +109,9 @@ export default tseslint.config(
         },
       ],
       'simple-import-sort/exports': 'error',
-      // 네이밍 컨벤션 — 노이즈 최소 셋(현재 코드 위반 0건). 자동수정 불가라 warn.
+      // 네이밍 컨벤션 — 노이즈 최소 셋(위반 0건 확인 후 error 승격). 노이지한 selector 는 아래에서 비활성.
       '@typescript-eslint/naming-convention': [
-        'warn',
+        'error',
         { selector: 'default', format: ['camelCase'], leadingUnderscore: 'allow' },
         {
           selector: 'variable',
@@ -90,22 +128,51 @@ export default tseslint.config(
         { selector: 'objectLiteralProperty', format: null },
         { selector: 'import', format: null },
       ],
-      // 색상 하드코딩 금지(권장) — sx/styled 등에서 #hex 리터럴 사용 시 theme 토큰 사용을 유도한다.
-      // 단일 소스인 features/theme/model/tokens.ts·스토리는 아래 override 로 예외. 게이트 차단 방지 위해 warn.
+      // 색상 하드코딩 금지 — sx/styled 등에서 #hex 리터럴 사용 시 theme 토큰 사용을 강제한다.
+      // 단일 소스인 features/theme/model/tokens.ts·스토리는 아래 override 로 예외. 위반 0건 확인 후 error 승격.
       'no-restricted-syntax': [
-        'warn',
+        'error',
         {
           selector: 'Literal[value=/^#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/]',
           message:
             '색상은 theme 토큰을 사용하세요(하드코딩 #hex 금지). features/theme 의 토큰을 참고하세요.',
         },
       ],
+      // 파일 구현 구조 강제(로컬 플러그인) — queryKey 상수 객체·named export 통일.
+      'local/query-key-object': 'error',
+      'local/no-default-export': 'error',
     },
   },
   {
     // 테마 토큰 단일 소스와 스토리는 색상 하드코딩 규칙 예외.
     files: ['src/features/theme/model/tokens.ts', '**/*.stories.tsx'],
     rules: { 'no-restricted-syntax': 'off' },
+  },
+  {
+    // default export 가 규약상 필요한 파일: Storybook(meta·preview), 빌드/툴 설정(vite·orval·steiger·playwright 등).
+    files: ['**/*.stories.tsx', '**/*.config.{ts,tsx}', '.storybook/**'],
+    rules: { 'local/no-default-export': 'off' },
+  },
+  {
+    // axios 격리 — api 세그먼트(features/*/api, shared/api) 밖에서 axiosInstance 직접 import 금지.
+    // 컴포넌트는 features/*의 React Query 훅을 거치게 강제(서버 상태 단일 경로).
+    files: ['src/**/*.{ts,tsx}'],
+    ignores: ['src/**/api/**'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: '@/shared/api',
+              importNames: ['axiosInstance'],
+              message:
+                'axios 호출은 features/*/api 세그먼트에만 두세요. 컴포넌트는 React Query 훅(useAuth·useUsers)을 거칩니다.',
+            },
+          ],
+        },
+      ],
+    },
   },
   jsxA11y.flatConfigs.recommended,
   ...storybook.configs['flat/recommended'],
