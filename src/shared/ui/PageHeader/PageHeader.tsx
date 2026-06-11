@@ -1,5 +1,5 @@
-import { Box, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
+import { Box, Typography } from '@mui/material';
 
 interface PageHeaderProps {
   title: string;

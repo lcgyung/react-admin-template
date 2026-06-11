@@ -1,15 +1,16 @@
 import { createBrowserRouter } from 'react-router-dom';
 
-import { ProtectedRoute } from './ProtectedRoute';
-import { RoleRoute } from './RoleRoute';
-import { paths } from '@/shared/config';
-import { AuthLayout } from '@/widgets/auth-layout';
-import { MainLayout } from '@/widgets/main-layout';
 import { DashboardPage } from '@/pages/dashboard';
 import { ForbiddenPage } from '@/pages/forbidden';
 import { LoginPage } from '@/pages/login';
 import { NotFoundPage } from '@/pages/not-found';
 import { UsersPage } from '@/pages/users';
+import { AuthLayout } from '@/widgets/auth-layout';
+import { MainLayout } from '@/widgets/main-layout';
+import { paths } from '@/shared/config';
+
+import { ProtectedRoute } from './ProtectedRoute';
+import { RoleRoute } from './RoleRoute';
 
 export const router = createBrowserRouter([
   {

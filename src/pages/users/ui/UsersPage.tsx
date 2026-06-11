@@ -10,11 +10,11 @@ import {
   TableRow,
 } from '@mui/material';
 
-import { Loading } from '@/shared/ui/Loading';
-import { PageHeader } from '@/shared/ui/PageHeader';
 import { useUsers } from '@/features/users';
 import type { Role } from '@/entities/user';
 import { formatDate } from '@/shared/lib/format';
+import { Loading } from '@/shared/ui/Loading';
+import { PageHeader } from '@/shared/ui/PageHeader';
 
 const roleColor: Record<Role, 'error' | 'warning' | 'default'> = {
   admin: 'error',

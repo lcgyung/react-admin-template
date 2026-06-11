@@ -1,4 +1,4 @@
-import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
+import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
 import type { Preview } from '@storybook/react';
 
 const theme = createTheme();

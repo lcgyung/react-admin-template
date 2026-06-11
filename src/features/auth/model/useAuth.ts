@@ -1,10 +1,15 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
+import { useAuthStore } from '@/entities/session';
+import { paths } from '@/shared/config';
 
 import { getMe, login, logout } from '../api/authApi';
-import { paths } from '@/shared/config';
-import { useAuthStore } from '@/entities/session';
 import type { LoginRequest } from './types';
+
+export const authKeys = {
+  me: ['me'] as const,
+};
 
 export const useLogin = () => {
   const setAuth = useAuthStore((s) => s.setAuth);
@@ -38,7 +43,7 @@ export const useMe = () => {
   const token = useAuthStore((s) => s.token);
 
   return useQuery({
-    queryKey: ['me'],
+    queryKey: authKeys.me,
     queryFn: getMe,
     enabled: Boolean(token),
   });

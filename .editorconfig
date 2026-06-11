@@ -1,0 +1,15 @@
+# EditorConfig — 에디터 기본 입력 규칙. .prettierrc.json 과 1:1 정합.
+# https://editorconfig.org
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.md]
+# 마크다운 줄 끝 공백 2칸은 강제 개행 의미 — trim 제외
+trim_trailing_whitespace = false

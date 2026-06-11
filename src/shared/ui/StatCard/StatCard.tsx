@@ -1,5 +1,5 @@
-import { Card, CardContent, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
+import { Card, CardContent, Typography } from '@mui/material';
 
 interface StatCardProps {
   label: string;

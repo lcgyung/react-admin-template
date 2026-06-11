@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom/vitest';
 // 제거 금지: axios 토큰 주입을 활성화하는 side-effect import (미주입 시 조용히 no-op).
 import '@/app/config/configureApi';
+
 import { afterAll, afterEach, beforeAll } from 'vitest';
 
 import { server } from '@/app/mocks/server';

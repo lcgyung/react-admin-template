@@ -1,11 +1,12 @@
+import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { LoginPage } from './LoginPage';
 import { useAuthStore } from '@/entities/session';
+
+import { LoginPage } from './LoginPage';
 
 const renderLoginPage = () => {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });

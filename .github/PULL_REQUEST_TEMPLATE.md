@@ -32,3 +32,16 @@
 ## 결정 사항 / 논의 기록
 
 -
+
+## 체크리스트
+
+- [ ] FSD 레이어/Public API 규칙 위반 없음 (`pnpm lint:fsd`)
+- [ ] 색·간격·타이포는 theme 토큰 사용 (하드코딩 `#hex`/`px` 없음)
+- [ ] 인터랙티브 요소 접근성(label/aria/role·키보드) 확인
+- [ ] 네이밍 규칙(컴포넌트 PascalCase·훅 `use*`·상수 UPPER_CASE) 준수
+- [ ] 린트·포맷 통과 (`pnpm lint`, `pnpm format`)
+- [ ] 동작 변경 시 테스트 추가/갱신, `pnpm test` 통과
+- [ ] 빌드 통과 (`pnpm build`)
+- [ ] 커밋 메시지 Conventional Commits 준수
+
+> 상세 기준: [`docs/STYLE_GUIDE.md`](../docs/STYLE_GUIDE.md)

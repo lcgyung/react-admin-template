@@ -15,6 +15,7 @@
 - 타입: `feat` / `fix` / `chore` / `docs` / `refactor` / `test` / `style` 등
 - 스코프(선택): 변경 영역을 괄호로. 예) `feat(fsd): ...`, `chore(release): ...`
 - 형식: `type(scope): subject`
+- 커밋 시 `.husky/commit-msg`의 commitlint(`@commitlint/config-conventional`)가 이 형식을 **자동 강제**합니다.
 
 PR은 [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md) 양식을 채워 작성하고, 폴더 구조·네이밍·라이브러리 선택 등 결정 사항을 본문에 명시합니다.
 

@@ -1,1 +1,1 @@
-export { useAuthStore, getAuthToken, clearAuthState } from './model/authStore';
+export { clearAuthState, getAuthToken, useAuthStore } from './model/authStore';

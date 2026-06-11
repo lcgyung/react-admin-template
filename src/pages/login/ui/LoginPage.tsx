@@ -1,10 +1,10 @@
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Alert, Box, Button, Card, CardContent, Stack, TextField, Typography } from '@mui/material';
-import { useForm } from 'react-hook-form';
 
+import type { LoginFormValues } from '@/features/auth';
 import { useLogin } from '@/features/auth';
 import { loginSchema } from '@/features/auth';
-import type { LoginFormValues } from '@/features/auth';
 
 export const LoginPage = () => {
   const login = useLogin();
