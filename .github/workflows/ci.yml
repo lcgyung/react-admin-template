@@ -77,10 +77,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Secret scan (gitleaks)
-        uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # 시크릿 스캔(전체 git 히스토리) — gitleaks-action 은 organization private 에서
+      # GITLEAKS_LICENSE 를 요구하고 PR fetch 시 GITHUB_TOKEN 권한에 묶인다. osv-scanner(아래)와
+      # 동일하게 핀 고정 CLI(Docker)로 교체해 라이선스/권한 의존 없이 히스토리를 스캔한다.
+      # pre-commit(gitleaks protect)·build 잡 dist grep 과 함께 다층 방어. 누출 시 exit 1 로 차단.
+      - name: Secret scan (gitleaks, 전체 히스토리)
+        run: |
+          docker run --rm -v "${{ github.workspace }}:/repo" \
+            ghcr.io/gitleaks/gitleaks:v8.30.1 \
+            git /repo --redact --no-banner --config=/repo/.gitleaks.toml
 
       # high/critical 만 차단, devDependency advisory(번들 미포함)는 --prod 로 제외.
       - name: Audit dependencies (SCA)
