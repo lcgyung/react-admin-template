@@ -14,8 +14,7 @@
     "noEmit": true,
     "jsx": "react-jsx",
 
-    /* Path alias */
-    "baseUrl": ".",
+    /* Path alias — baseUrl 없이 paths 만 사용(TS5.0+; baseUrl 은 TS6 deprecated·TS7 제거). 상대값이라 tsconfig 위치 기준 해석. */
     "paths": {
       "@/*": ["./src/*"]
     },
