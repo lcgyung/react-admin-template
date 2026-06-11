@@ -62,7 +62,7 @@
 
 - [x] 🔴 husky + lint-staged — `.husky/` · `package.json` lint-staged
 - [x] 🔴 PR 검증 워크플로 — lint · typecheck · test · build — `ci.yml` `build` job (+ lint:fsd·산출물 시크릿 스캔)
-- [x] 🟡 commitlint + Conventional Commits — `commitlint.config.js` · `.husky/commit-msg`
+- [x] 🟡 commitlint + Conventional Commits — `package.json` `commitlint` 키 · `.husky/commit-msg`
 - [ ] 🟢 프리뷰 배포 (PR별 미리보기) — 미적용(Vercel 타깃 제거, 2026-06-11). 필요 시 호스팅 연결 후 SPA rewrite + 보안 헤더(`nginx.conf` 참고)를 해당 호스팅 설정에 구성
 
 ## 8. 관찰가능성

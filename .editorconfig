@@ -1,4 +1,4 @@
-# EditorConfig — 에디터 기본 입력 규칙. .prettierrc.json 과 1:1 정합.
+# EditorConfig — 에디터 기본 입력 규칙. package.json "prettier" 키와 1:1 정합.
 # https://editorconfig.org
 root = true
 

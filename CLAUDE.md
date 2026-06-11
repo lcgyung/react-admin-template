@@ -85,6 +85,8 @@ paths에 안 걸리는 작업에서 해당 주제를 다루면 직접 Read 하�
 - **PostToolUse(Edit/Write)** → `format-changed-file.sh`: 변경된 `*.ts(x)` 에 `eslint --fix` + `prettier` 자동 적용.
 - **Stop** → `gate.sh`: 세션 종료 전 `tsc -b --noEmit` + `eslint .` + `prettier --check .` + `steiger ./src`(FSD) + `vitest run` 게이트. 실패하면 `exit 2` 로 계속 수정을 유도한다. `stop_hook_active` 무한루프 가드 포함.
 - `.claude/agents/code-reviewer.md`(리뷰 실행 서브에이전트), `.claude/skills/code-review/`(리뷰 기준)가 함께 제공된다.
+- 커밋 시 Husky가 gitleaks+lint-staged(pre-commit)·commitlint(commit-msg, 설정은 `package.json`
+  `commitlint` 키)를 강제한다. subject는 대문자/sentence-case 시작 금지(`subject-case`).
 
 ## 문서 지도
 

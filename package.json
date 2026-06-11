@@ -93,6 +93,38 @@
     "vite": "^6.0.3",
     "vitest": "^3.0.0"
   },
+  "prettier": {
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "all",
+    "printWidth": 100,
+    "tabWidth": 2,
+    "endOfLine": "lf"
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ],
+    "rules": {
+      "type-enum": [
+        2,
+        "always",
+        [
+          "feat",
+          "fix",
+          "chore",
+          "docs",
+          "refactor",
+          "test",
+          "style",
+          "perf",
+          "build",
+          "ci",
+          "revert"
+        ]
+      ]
+    }
+  },
   "lint-staged": {
     "*.{ts,tsx}": [
       "eslint --fix",
