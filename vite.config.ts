@@ -3,10 +3,10 @@ import path from 'node:path';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig } from 'vitest/config';
 
-// 보안 헤더(문서 응답). 호스팅 정본은 nginx.conf·vercel.json 이며, 여기 값은 로컬 dev/preview 용이다.
+// 보안 헤더(문서 응답). 호스팅 정본은 nginx.conf 이며, 여기 값은 로컬 dev/preview 용이다.
 // CSP 는 여기서 적용하지 않는다 — 로컬 목 데모는 교차출처 http(VITE_API_BASE_URL=localhost:3000)·무TLS 라
 // 프로덕션 전용 CSP(connect-src 'self'·upgrade-insecure-requests)와 충돌한다(ADR 0007). CSP 정본은
-// nginx.conf·vercel.json(프로덕션)에만 둔다.
+// nginx.conf(프로덕션)에만 둔다.
 const SECURITY_HEADERS = {
   'X-Frame-Options': 'DENY',
   'X-Content-Type-Options': 'nosniff',
@@ -23,7 +23,7 @@ export default defineConfig(({ command }) => ({
     process.env.ANALYZE === 'true' &&
       visualizer({ filename: 'dist/stats.html', gzipSize: true, brotliSize: true }),
   ],
-  // dev/preview 서버: CSP 없이 공통 보안 헤더만 적용(CSP 정본은 nginx.conf·vercel.json).
+  // dev/preview 서버: CSP 없이 공통 보안 헤더만 적용(CSP 정본은 nginx.conf).
   server: { headers: SECURITY_HEADERS },
   preview: { headers: SECURITY_HEADERS },
   // 프로덕션 번들에서 console/debugger 제거 — 정보 노출·디버그 흔적 차단(dev/test 는 유지).

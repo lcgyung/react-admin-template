@@ -49,7 +49,7 @@
 - **서버측 폼 검증** — 클라이언트(zod)는 UX·1차 방어일 뿐, 신뢰 경계는 서버다.
 - **인증 갱신(refresh) 흐름** — 현재는 401 시 인증 초기화 + `/login` 리다이렉트만 한다(안전한
   실패). 리프레시 토큰 회전은 백엔드 설계가 선행돼야 한다(ADR 0005).
-- **CSP `connect-src` 좁히기** — `nginx.conf`·`vercel.json` 은 `connect-src 'self'` 로 둔다. 실제
+- **CSP `connect-src` 좁히기** — `nginx.conf` 는 `connect-src 'self'` 로 둔다. 실제
   백엔드/Sentry 연동 시 해당 API origin·Sentry ingest 도메인을 추가하지 않으면 요청이 차단된다
   (예: `connect-src 'self' https://api.example.com https://o0.ingest.sentry.io`).
   [`docs/adr/0007-security-headers-csp.md`](docs/adr/0007-security-headers-csp.md) 참고.
@@ -62,7 +62,7 @@
   `innerHTML` 등을 정적 차단. `eslint-plugin-security` 병행.
 - **오픈 리다이렉트 차단** — 리다이렉트 대상은 `@/shared/lib/url` 의 `isInternalPath`/
   `resolveInternalRedirect` 로 내부 경로만 허용한다.
-- **보안 헤더 / CSP** — `nginx.conf`·`vercel.json`(정본) + vite preview 에 실용 베이스라인 CSP
+- **보안 헤더 / CSP** — `nginx.conf`(정본) + vite preview 에 실용 베이스라인 CSP
   (`upgrade-insecure-requests` 포함) + `X-Frame-Options`/`Referrer-Policy`/`Permissions-Policy`/
   `nosniff`(ADR 0007).
 - **에러 트래킹 PII 스크러빙** — Sentry 는 env-gated(`VITE_SENTRY_DSN` 설정 시에만)이며,

@@ -2,6 +2,7 @@
 
 - 상태: Accepted
 - 날짜: 2026-06-11
+- 갱신: 2026-06-11 — Vercel 배포 타깃 제거(미사용)로 `vercel.json` 삭제, 정본을 `nginx.conf` 단일로 변경
 
 ## 맥락
 
@@ -29,8 +30,8 @@ upgrade-insecure-requests;          # http 서브리소스를 https 로 자동 �
 
 ### 적용 위치
 
-- **정본(프로덕션)**: `nginx.conf`(Docker) · `vercel.json`(`headers`). 두 곳에 동일 세트를 둔다
-  (`upgrade-insecure-requests` 포함).
+- **정본(프로덕션)**: `nginx.conf`(Docker), `upgrade-insecure-requests` 포함. 다른 호스팅으로
+  배포할 땐 이 세트를 해당 호스팅의 헤더 설정으로 옮긴다.
 - **로컬(dev·preview)**: `vite.config.ts` 의 `server.headers`·`preview.headers` 는 **CSP 를 적용하지
   않고** 공통 보안 헤더만 둔다. 로컬 목 데모는 교차출처 http(`VITE_API_BASE_URL=localhost:3000`)·무TLS
   라, 프로덕션 전용 CSP(`connect-src 'self'`·`upgrade-insecure-requests`)를 그대로 적용하면 목 API

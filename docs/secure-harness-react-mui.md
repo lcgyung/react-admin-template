@@ -44,7 +44,7 @@
 
 ## 4. 콘텐츠 보안 정책 & 헤더 (서버/호스팅 연계)
 
-- [x] 🔴 CSP 설정 — `script-src` 제한, inline script 최소화 — `nginx.conf`·`vercel.json`·vite preview (ADR 0007)
+- [x] 🔴 CSP 설정 — `script-src` 제한, inline script 최소화 — `nginx.conf`(정본; dev/preview 는 공통 헤더만) (ADR 0007)
 - [x] 🔴 `frame-ancestors` (클릭재킹 방지) — `frame-ancestors 'none'` + `X-Frame-Options: DENY`
 - [ ] 🟡 서드파티 스크립트 SRI(Subresource Integrity) — 해당 없음(외부 스크립트 없음). 추가 시 `integrity`
 - [x] 🟡 `Referrer-Policy`, `Permissions-Policy` — `no-referrer` · `camera=(), microphone=(), geolocation=()`

@@ -128,17 +128,18 @@ OpenAPI 문서로 교체하세요. 도메인 모델의 단일 출처는 `entitie
   (CodeQL SAST 는 private 저장소 코드 스캐닝이 GHAS 를 요구해 보류 — public 전환·GHAS 도입 시 재적용.)
 - **시크릿 스캔** — gitleaks (pre-commit + CI) + 빌드 산출물(dist) 시크릿 스캔. 프론트 번들 시크릿 유출에 특히 주의합니다.
 - **의존성** — `pnpm audit`(CI, high 차단, `--prod`) + osv-scanner(교차검증, 비차단) + Dependabot 주간 업데이트(`.github/dependabot.yml`).
-- **보안 헤더 / CSP** — `nginx.conf`·`vercel.json`(정본)과 vite preview 에 실용 베이스라인 CSP +
+- **보안 헤더 / CSP** — `nginx.conf`(정본)와 vite preview 에 실용 베이스라인 CSP +
   `X-Frame-Options`/`Referrer-Policy`/`Permissions-Policy`/`nosniff` 적용([ADR 0007](docs/adr/0007-security-headers-csp.md)).
 - **프로덕션 빌드** — `console`/`debugger` 제거(`vite.config.ts`). 오픈 리다이렉트는 `isInternalPath` 가드로 내부 경로만 허용.
 - 위협 모델·의도된 트레이드오프·취약점 신고 절차는 [`SECURITY.md`](SECURITY.md), 전체 점검표는
   [`docs/secure-harness-react-mui.md`](docs/secure-harness-react-mui.md), 토큰 저장 트레이드오프는
   [ADR 0005](docs/adr/0005-token-storage.md) 참고.
 
-## 배포 (프리뷰)
+## 배포
 
-`vercel.json`이 SPA 빌드/리라이트를 설정합니다. 저장소를 Vercel에 연결하면 PR마다 프리뷰 배포가
-자동 생성됩니다. 다른 호스팅(Netlify/Cloudflare Pages 등)도 `pnpm build` → `dist` 정적 서빙으로 동일하게 동작합니다.
+`Dockerfile` + `nginx.conf`(SPA fallback·보안 헤더 포함)로 컨테이너 배포합니다. 정적 호스팅
+(Netlify/Cloudflare Pages 등)도 `pnpm build` → `dist` 정적 서빙으로 동작하지만, 이 경우 SPA
+fallback 리라이트와 보안 헤더(`nginx.conf` 참고)를 해당 호스팅 설정으로 옮겨야 합니다.
 
 ## 아키텍처 결정 기록 (ADR)
 
