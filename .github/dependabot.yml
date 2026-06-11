@@ -3,6 +3,8 @@ updates:
   # npm(pnpm-lock.yaml) 의존성 — 주간. minor/patch 는 묶어서 PR 노이즈를 줄인다.
   - package-ecosystem: npm
     directory: '/'
+    # 의존성 업데이트 PR 은 dev 로 보낸다 — main 에는 dev→main 통합 PR 만 올린다.
+    target-branch: dev
     schedule:
       interval: weekly
     open-pull-requests-limit: 10
@@ -17,5 +19,6 @@ updates:
   # GitHub Actions 워크플로의 액션 버전 — 주간.
   - package-ecosystem: github-actions
     directory: '/'
+    target-branch: dev
     schedule:
       interval: weekly
