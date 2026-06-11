@@ -124,8 +124,8 @@ OpenAPI 문서로 교체하세요. 도메인 모델의 단일 출처는 `entitie
 
 ## 보안
 
-- **정적 분석** — `eslint-plugin-security` + `eslint-plugin-no-unsanitized`(DOM XSS sink 차단) +
-  CodeQL SAST(`.github/workflows/codeql.yml`).
+- **정적 분석** — `eslint-plugin-security` + `eslint-plugin-no-unsanitized`(DOM XSS sink 차단).
+  (CodeQL SAST 는 private 저장소 코드 스캐닝이 GHAS 를 요구해 보류 — public 전환·GHAS 도입 시 재적용.)
 - **시크릿 스캔** — gitleaks (pre-commit + CI) + 빌드 산출물(dist) 시크릿 스캔. 프론트 번들 시크릿 유출에 특히 주의합니다.
 - **의존성** — `pnpm audit`(CI, high 차단, `--prod`) + osv-scanner(교차검증, 비차단) + Dependabot 주간 업데이트(`.github/dependabot.yml`).
 - **보안 헤더 / CSP** — `nginx.conf`·`vercel.json`(정본)과 vite preview 에 실용 베이스라인 CSP +

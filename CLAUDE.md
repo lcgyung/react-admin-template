@@ -136,9 +136,9 @@ src
 - **ESLint + Prettier** — 모든 코드는 린트/포매팅 규칙을 통과해야 합니다 (`pnpm lint`, `pnpm format`).
 - **보안 정적 분석** — `eslint-plugin-no-unsanitized`가 `dangerouslySetInnerHTML`·`innerHTML` 등
   DOM XSS sink를 **error로 차단**합니다(불가피하면 DOMPurify). `eslint-plugin-security`도 켜져 있고,
-  CI는 CodeQL(SAST)·dist 시크릿 스캔을 추가로 돌립니다. 리다이렉트 대상은 `@/shared/lib/url`의
+  CI는 dist 시크릿 스캔(gitleaks + 빌드 산출물 grep)을 추가로 돌립니다. 리다이렉트 대상은 `@/shared/lib/url`의
   `isInternalPath`/`resolveInternalRedirect`로 내부 경로만 허용합니다(오픈 리다이렉트 방지).
-  CSP·보안 헤더 정본은 `nginx.conf`·`vercel.json`(로컬은 `vite.config.ts` preview)이며
+  CSP·보안 헤더 정본은 `nginx.conf`·`vercel.json`(로컬 dev/preview 는 CSP 없이 공통 헤더만)이며
   [ADR 0007](docs/adr/0007-security-headers-csp.md) 참고. 보안 점검표는
   [`docs/secure-harness-react-mui.md`](docs/secure-harness-react-mui.md)에 있습니다.
 - **테스트 커버리지(ratchet)** — `pnpm test:coverage`(v8)가 `vite.config.ts`의 임계값을 강제하고

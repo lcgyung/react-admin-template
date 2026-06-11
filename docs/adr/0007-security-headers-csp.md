@@ -29,9 +29,12 @@ upgrade-insecure-requests;          # http 서브리소스를 https 로 자동 �
 
 ### 적용 위치
 
-- **정본(프로덕션)**: `nginx.conf`(Docker) · `vercel.json`(`headers`). 두 곳에 동일 세트를 둔다.
-- **로컬**: `vite.config.ts` 의 `preview.headers`(빌드 산출물, CSP 포함) · `server.headers`(dev,
-  HMR 의 websocket·eval 충돌 방지를 위해 **CSP 제외**, 나머지 헤더만).
+- **정본(프로덕션)**: `nginx.conf`(Docker) · `vercel.json`(`headers`). 두 곳에 동일 세트를 둔다
+  (`upgrade-insecure-requests` 포함).
+- **로컬(dev·preview)**: `vite.config.ts` 의 `server.headers`·`preview.headers` 는 **CSP 를 적용하지
+  않고** 공통 보안 헤더만 둔다. 로컬 목 데모는 교차출처 http(`VITE_API_BASE_URL=localhost:3000`)·무TLS
+  라, 프로덕션 전용 CSP(`connect-src 'self'`·`upgrade-insecure-requests`)를 그대로 적용하면 목 API
+  호출이 차단되고 e2e(preview) 가 깨진다. 따라서 CSP 는 프로덕션 정본에서만 검증한다.
 - **`index.html` meta 미사용**: `frame-ancestors` 등은 meta 로 표현 불가하고, 헤더와 이중 관리가
   되므로 CSP 는 헤더로만 둔다.
 

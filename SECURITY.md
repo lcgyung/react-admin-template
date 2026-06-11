@@ -59,7 +59,7 @@
 트레이드오프와 별개로, 다음은 템플릿에 **구현되어 있다**(후속 과제가 아님).
 
 - **DOM XSS sink 차단** — `eslint-plugin-no-unsanitized`(error)로 `dangerouslySetInnerHTML`·
-  `innerHTML` 등을 정적 차단. `eslint-plugin-security` + CodeQL SAST 병행.
+  `innerHTML` 등을 정적 차단. `eslint-plugin-security` 병행.
 - **오픈 리다이렉트 차단** — 리다이렉트 대상은 `@/shared/lib/url` 의 `isInternalPath`/
   `resolveInternalRedirect` 로 내부 경로만 허용한다.
 - **보안 헤더 / CSP** — `nginx.conf`·`vercel.json`(정본) + vite preview 에 실용 베이스라인 CSP

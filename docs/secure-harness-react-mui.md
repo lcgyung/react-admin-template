@@ -13,7 +13,7 @@
 ## 0. 보안 자동화 기반
 
 - [x] 🔴 `eslint-plugin-security` + `eslint-plugin-no-unsanitized` + `eslint-plugin-react` — `eslint.config.js`
-- [x] 🔴 SAST — Semgrep / CodeQL CI 게이트 — `.github/workflows/codeql.yml` (CodeQL)
+- [ ] 🔴 SAST — Semgrep / CodeQL CI 게이트 — 미적용: private 저장소 코드 스캐닝은 GHAS(유료) 필요. public 전환·GHAS 도입 시 `codeql.yml` 재도입
 - [x] 🔴 시크릿 스캔 — gitleaks (pre-commit + CI) — `.gitleaks.toml` · `.husky/pre-commit` · `ci.yml`
 - [x] 🔴 SCA — `pnpm audit`(high+ 차단, `--prod`) + osv-scanner(교차검증, 비차단) — `ci.yml` (`security` job). Socket(공급망)은 선택
 - [x] 🔴 lockfile 커밋 + `--frozen-lockfile` — `pnpm-lock.yaml` · CI 전 job
@@ -66,14 +66,14 @@
 
 ## 7. CI/CD 보안 게이트
 
-- [x] 🔴 PR 게이트 — lint(security) · SAST · 시크릿 · SCA — `ci.yml` + `codeql.yml`
+- [x] 🔴 PR 게이트 — lint(security) · 시크릿 · SCA · e2e · Lighthouse — `ci.yml` (SAST 는 private+GHAS 부재로 보류)
 - [ ] 🔴 브랜치 보호 + 필수 리뷰 — `.github/CODEOWNERS` 제공 + 권장설정 문서화. GitHub 브랜치 보호 토글은 저장소 관리자 설정(아래 참고)
 - [x] 🟡 빌드 산출물 시크릿 스캔 — `ci.yml` "Scan build output for secrets"
 - [ ] 🟡 에러 트래킹 (Sentry) — source map 비공개 업로드, PII 스크러빙 — 부분: PII 스크러빙 O(`sentry.ts`), 소스맵 업로드는 통합자(SENTRY_AUTH_TOKEN)
 - [ ] 🟢 서명 커밋 — 선택(개발자 환경 설정)
 
 > **브랜치 보호 권장 설정** (GitHub → Settings → Branches, `main`·`dev`): 필수 status checks =
-> `build` · `security` · `e2e` · `CodeQL` / Require PR review (+ Code Owners) / 직접 푸시 금지.
+> `build` · `security` · `e2e` · `lighthouse` / Require PR review (+ Code Owners) / 직접 푸시 금지.
 
 ---
 

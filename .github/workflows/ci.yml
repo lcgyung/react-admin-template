@@ -87,12 +87,11 @@ jobs:
         run: pnpm audit --audit-level high --prod
 
       # OSV 교차검증 — advisory DB 다양성 확보용. 비차단(보고용).
-      - name: osv-scanner
-        uses: google/osv-scanner-action@v1
+      # google/osv-scanner-action 은 SARIF 업로드(코드 스캐닝)를 전제로 하는데, private 저장소는
+      # GHAS 없이는 업로드가 막힌다. 따라서 핀 고정 CLI(Docker)로 결과를 로그에만 남긴다.
+      - name: osv-scanner (SCA 교차검증, 비차단)
         continue-on-error: true
-        with:
-          scan-args: |-
-            --lockfile=pnpm-lock.yaml
+        run: docker run --rm -v "${{ github.workspace }}:/src" ghcr.io/google/osv-scanner:v2.3.8 scan -L /src/pnpm-lock.yaml
 
   e2e:
     runs-on: ubuntu-latest
