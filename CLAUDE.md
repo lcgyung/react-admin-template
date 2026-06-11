@@ -3,8 +3,8 @@
 이 문서는 Claude Code(claude.ai/code)가 이 리포지토리에서 작업할 때 참고하는 가이드입니다.
 
 **React Admin Template** — React + TypeScript + Vite 기반 관리자 템플릿. 기능 목록·기술 스택·
-빠른 시작·데모 계정 등 개요는 [`README.md`](README.md)를 참고하세요. 이 문서는 코드만 봐서는
-알기 어려운 작업 규칙에 집중합니다.
+빠른 시작·데모 계정 등 개요는 [`README.md`](README.md)를 참고하세요. 이 문서는 모든 세션에
+필요한 코어(명령어·구조·gotcha)만 담고, 주제별 상세 규칙은 `.claude/rules/`가 맡습니다(아래 인덱스).
 
 ## 패키지 매니저
 
@@ -31,8 +31,8 @@ pnpm exec vitest run -t "짧은 비밀번호"                       # 테스트�
 
 pnpm exec tsc -b --noEmit        # 타입체크 단독 (project references; Stop 게이트가 사용)
 
+pnpm gen:slice                   # FSD 슬라이스 골격 생성 (plop)
 pnpm storybook                   # Storybook (6006)
-pnpm build-storybook             # 정적 Storybook 빌드
 ```
 
 > 전체 스크립트·데모 계정·환경 변수는 [`README.md`](README.md) 참고.
@@ -40,91 +40,54 @@ pnpm build-storybook             # 정적 Storybook 빌드
 ## 프로젝트 구조 (FSD 6레이어)
 
 경로 별칭: `@/*` → `src/*` (`tsconfig`, `vite.config.ts` 양쪽에 설정).
-[Feature-Sliced Design 2.x](https://feature-sliced.design) 구조이며 `pnpm lint:fsd`(Steiger,
-`steiger.config.ts` = recommended)가 규칙을 하드 강제합니다.
 
 ```text
 src
 ├── app          # 전역 설정 — providers(App/Query), router(라우터+가드), mocks(MSW), config(configureApi)
 ├── pages        # 라우트 화면 슬라이스 — login(+test) / dashboard / users / forbidden / not-found
 ├── widgets      # 합성 UI 블록 — main-layout(MainLayout+Sidebar+Header 통합 셸), auth-layout
-├── features     # 사용자 기능 — auth(useAuth·authApi·loginSchema), users(useUsers·usersApi·userFormSchema), theme(themeStore+ThemeProvider)
+├── features     # 사용자 기능 — auth / users / theme
 ├── entities     # 도메인 모델 — user(User/Role 타입 + @x/session), session(authStore)
-└── shared       # 도메인 무관 인프라 — api(axiosInstance), ui(Loading/PageHeader/StatCard), lib(format), config(paths)
+└── shared       # 도메인 무관 인프라 — api(axiosInstance), ui, lib, config
 ```
 
-(`main.tsx`·`vite-env.d.ts`는 루트 유지 — 진입점/ambient 타입.)
+FSD 핵심 3줄: 레이어는 **단방향**(`app > pages > widgets > features > entities > shared`),
+슬라이스 간 import는 **Public API 배럴 경유**(같은 레이어 간 금지, `@x` 예외),
+위반은 `pnpm lint:fsd`(steiger)가 CI·Stop 게이트에서 **error로 차단** — 상세는
+[rules/fsd-architecture.md](.claude/rules/fsd-architecture.md).
 
-### FSD 의존성 규칙
+## ⚠️ axios 인증 브리지 (gotcha)
 
-- **레이어 단방향**: `app > pages > widgets > features > entities > shared`. 모듈은 자기보다
-  **엄격히 아래** 레이어만 import할 수 있다.
-- **같은 레이어 슬라이스 간 import 금지**. 유일한 예외는 `@x` 크로스임포트 API —
-  `entities/session`은 `@/entities/user/@x/session`에서 `User`를 가져온다.
-- **Public API**: 슬라이스 간 import는 반드시 `index.ts` 배럴 경유(`@/features/auth`,
-  `@/widgets/main-layout` 등 — 내부 깊은 경로 우회 금지). `shared`는 세그먼트 배럴 경유
-  (`@/shared/api`, `@/shared/config`; `@/shared/ui/<Name>`, `@/shared/lib/<name>`은 그대로).
-- **세그먼트 이름은 "왜"로**: `ui / api / model / lib / config`. `components`/`hooks` 같은
-  "무엇" 이름 금지.
-- 위반은 `pnpm lint:fsd`가 CI·Stop 게이트에서 error로 차단한다.
+`shared/api/axiosInstance.ts`는 도메인 의존이 0이며, 인증 콜백(getToken/onUnauthorized)은
+`app/config/configureApi.ts`가 주입한다. `app/App.tsx`와 `vitest.setup.ts` 최상단의
+side-effect import(`@/app/config/configureApi`)를 **제거하면 타입 에러 없이 토큰 주입·401
+리다이렉트가 조용히 무력화**된다 — 제거 금지.
 
-## 아키텍처 / 상태 관리 규칙
+## 규칙 인덱스 (`.claude/rules/`)
 
-- **서버 상태** → React Query. 컴포넌트에서 직접 `axios`를 호출하지 말고 `features/*`의
-  React Query 훅(`useAuth`, `useUsers`)을 거칩니다.
-- **API 호출** → `features/*/api`의 Axios 레이어 함수로 정의(슬라이스 내부용, 배럴 미노출).
-  `shared/api`의 `axiosInstance`가 요청 인터셉터로 토큰을 주입하고, 응답 인터셉터로 401 시
-  인증 상태를 초기화하고 `/login`으로 보냅니다.
+주제별 상세 규칙은 path-scoped rules로 분리되어, 매칭 파일 작업 시 자동 로드됩니다.
+paths에 안 걸리는 작업에서 해당 주제를 다루면 직접 Read 하세요.
 
-  ```typescript
-  export const getUsers = async () => {
-    const { data } = await axiosInstance.get<User[]>('/users');
-    return data;
-  };
-  ```
-
-- ⚠️ **axios 인증 브리지(gotcha)** — `shared/api/axiosInstance.ts`는 도메인 의존이 0이며,
-  인증 콜백(getToken/onUnauthorized)은 `app/config/configureApi.ts`가 주입한다.
-  `app/App.tsx`와 `vitest.setup.ts` 최상단의 side-effect import(`@/app/config/configureApi`)를
-  **제거하면 타입 에러 없이 토큰 주입·401 리다이렉트가 조용히 무력화**된다 — 제거 금지.
-- **전역 클라이언트 상태** → Zustand. `entities/session`(authStore: token/user, persist),
-  `features/theme`(themeStore: light/dark, persist). React 외부(주입 콜백)에서는
-  `getAuthToken()` / `clearAuthState()` 헬퍼로 접근합니다.
-- **폼 / 검증** → React Hook Form + Zod. 스키마는 해당 feature의 `model` 세그먼트에 정의하고
-  (`features/auth/model/loginSchema.ts`, `features/users/model/userFormSchema.ts`)
-  `zodResolver`로 연결합니다.
-
-## 인증 & RBAC
-
-- 로그인 성공 시 `authStore`(`entities/session`)에 `token`/`user`를 저장(persist)합니다.
-- 라우트 가드는 `src/app/router`에 있습니다.
-  - `ProtectedRoute` — 미인증 시 `/login` 리다이렉트.
-  - `RoleRoute` — `allowedRoles` 미충족 시 `/403` 리다이렉트.
-- 사이드바 메뉴는 `widgets/main-layout/ui/Sidebar.tsx`의 `menuItems[].allowedRoles`로 역할 필터링됩니다.
-- 역할: `'admin' | 'manager' | 'user'`. `/users`는 `admin`/`manager`만 접근 가능합니다.
-- RBAC는 프런트엔드(메뉴·라우트) 차원의 제어입니다. 실제 데이터 권한은 백엔드에서 강제해야 합니다.
-
-## 목 API (MSW)
-
-- `VITE_ENABLE_MOCK=true` 일 때 `src/main.tsx`가 MSW 워커를 기동합니다.
-- 핸들러는 `src/app/mocks/handlers.ts`(로그인/로그아웃/me/users), 시드 데이터는 `src/app/mocks/data.ts`.
-- 테스트에서는 `src/app/mocks/server.ts`(setupServer)를 `vitest.setup.ts`가 기동합니다.
-- 데모 계정과 환경 변수(`VITE_ENABLE_MOCK` / `VITE_API_BASE_URL`)는 `README.md` 와 `.env.example` 참고.
-
-## 코드 컨벤션
-
-- **타입 안정성 우선** — TypeScript 타입을 명확히 지정하고 `any` 사용을 지양합니다.
-  `tsconfig`에 `strict`, `noUnusedLocals/Parameters`가 켜져 있습니다.
-- **최소 보일러플레이트** — 불필요한 추상화를 피하고 간결하게 작성합니다.
-- **ESLint + Prettier** — 모든 코드는 린트/포매팅 규칙을 통과해야 합니다 (`pnpm lint`, `pnpm format`).
-- **Husky + Lint-Staged** — 커밋 시 변경 파일에 자동으로 `eslint --fix` + `prettier`가 적용됩니다.
+| 파일                                                     | 내용                                               | 자동 로드 조건                            |
+| -------------------------------------------------------- | -------------------------------------------------- | ----------------------------------------- |
+| [fsd-architecture.md](.claude/rules/fsd-architecture.md) | FSD 의존성·상태관리(React Query/Zustand)·인증/RBAC | `src/**`                                  |
+| [slice-blueprint.md](.claude/rules/slice-blueprint.md)   | 슬라이스 구현 골격·`gen:slice` 체크리스트          | `src/{features,entities,shared}/**`, plop |
+| [code-style.md](.claude/rules/code-style.md)             | 컨벤션 해설(정본은 `eslint.config.js`)             | `src/**/*.ts(x)`, `.storybook/**`         |
+| [security.md](.claude/rules/security.md)                 | XSS·리다이렉트·CSP 정본 위치·시크릿 스캔           | `src/**`, `nginx.conf`, CI 워크플로 등    |
+| [testing.md](.claude/rules/testing.md)                   | MSW·커버리지 ratchet·테스트 실행법                 | 테스트·mocks·vitest/playwright 설정       |
 
 ## Claude Code 자동화 (`.claude/`)
 
 `.claude/settings.json` 이 훅을 등록한다. 코드를 만질 때 아래 동작을 전제로 한다.
 
-- **SessionStart** → `session-context.sh`: 브랜치 등 컨텍스트를 주입.
+- **SessionStart** → `session-context.sh`: 현재 브랜치를 컨텍스트로 주입.
 - **PreToolUse(Bash)** → `guard-bash.sh`: 파괴적 명령(`rm -rf /`, force push, `reset --hard` 등)을 차단.
 - **PostToolUse(Edit/Write)** → `format-changed-file.sh`: 변경된 `*.ts(x)` 에 `eslint --fix` + `prettier` 자동 적용.
-- **Stop** → `gate.sh`: 세션 종료 전 `tsc -b --noEmit` + `eslint .` + `steiger ./src`(FSD) + `vitest run` 게이트. 실패하면 `exit 2` 로 계속 수정을 유도한다. `stop_hook_active` 무한루프 가드 포함.
-- `.claude/agents/code-reviewer.md`, `.claude/skills/code-review/` 가 함께 제공된다.
+- **Stop** → `gate.sh`: 세션 종료 전 `tsc -b --noEmit` + `eslint .` + `prettier --check .` + `steiger ./src`(FSD) + `vitest run` 게이트. 실패하면 `exit 2` 로 계속 수정을 유도한다. `stop_hook_active` 무한루프 가드 포함.
+- `.claude/agents/code-reviewer.md`(리뷰 실행 서브에이전트), `.claude/skills/code-review/`(리뷰 기준)가 함께 제공된다.
+- 커밋 시 Husky가 gitleaks+lint-staged(pre-commit)·commitlint(commit-msg, 설정은 `package.json`
+  `commitlint` 키)를 강제한다. subject는 대문자/sentence-case 시작 금지(`subject-case`).
+
+## 문서 지도
+
+- 설계 결정(왜): [`docs/adr/`](docs/adr/README.md) — 상태관리·FSD·orval·토큰 저장·관찰가능성·CSP.

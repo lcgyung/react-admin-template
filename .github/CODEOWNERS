@@ -1,0 +1,10 @@
+# Code owners — PR 필수 리뷰 라우팅(브랜치 보호의 "Require review from Code Owners" 와 함께 사용).
+# 기본 소유자: 저장소 소유자. 팀/조직 사용 시 @org/team 핸들로 교체한다.
+* @lcgyung
+
+# 보안에 민감한 표면은 별도 명시(필요 시 보안 담당자로 분리).
+/.github/workflows/   @lcgyung
+/nginx.conf           @lcgyung
+/vercel.json          @lcgyung
+/src/shared/api/      @lcgyung
+/src/app/             @lcgyung

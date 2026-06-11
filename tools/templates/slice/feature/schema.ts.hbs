@@ -1,0 +1,8 @@
+import { z } from 'zod';
+
+export const {{camelCase name}}Schema = z.object({
+  // TODO: 폼 필드를 정의하세요.
+  name: z.string().min(1, '필수 항목입니다.'),
+});
+
+export type {{pascalCase name}}FormValues = z.infer<typeof {{camelCase name}}Schema>;

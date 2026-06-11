@@ -2,6 +2,30 @@
 
 이 프로젝트의 주요 변경 사항을 기록합니다. [Keep a Changelog](https://keepachangelog.com/ko/1.1.0/) 형식과 [Semantic Versioning](https://semver.org/lang/ko/)을 따릅니다.
 
+## [0.2.0] - 2026-06-11
+
+### Added
+
+- orval 기반 API 타입 자동 생성(openapi 스펙 → `shared/api/generated`)
+- 관찰가능성: Sentry(DSN 시 동적 로드)·Web Vitals env-gated 스텁 + 루트 ErrorBoundary
+- E2E(Playwright) + Lighthouse CI(접근성·SEO·모범사례 0.9 게이트)
+- FSD 구현 컨벤션 하네스: 구조 ESLint 룰 + 슬라이스 제너레이터(plop) + 골격 문서
+- path-scoped `.claude/rules/` 5종, ADR 0001~0007
+
+### Changed
+
+- Node 런타임 24로 통일(engines·`.nvmrc`·Dockerfile·CI)
+- 문서 정비: CLAUDE.md 코어화 + 규칙 인덱스, README 최신화
+
+### Security
+
+- 보안 하네스 보강: CSP/보안 헤더(`nginx.conf` 정본), gitleaks, SCA(pnpm audit + osv), 빌드 산출물 시크릿 스캔
+
+### Removed
+
+- Vercel 배포 타깃 제거(CSP 정본을 `nginx.conf`로 단일화)
+- 완료된 하네스 체크리스트 문서 제거
+
 ## [0.1.0] - 2026-06-10
 
 ### Added

@@ -1,8 +1,8 @@
 import { Navigate, Outlet } from 'react-router-dom';
 
-import { paths } from '@/shared/config';
 import { useAuthStore } from '@/entities/session';
 import type { Role } from '@/entities/user';
+import { paths } from '@/shared/config';
 
 interface RoleRouteProps {
   allowedRoles: Role[];

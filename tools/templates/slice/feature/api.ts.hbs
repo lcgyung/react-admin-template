@@ -1,0 +1,14 @@
+import { axiosInstance } from '@/shared/api';
+
+import type { {{pascalCase name}}FormValues } from '../model/{{camelCase name}}Schema';
+
+// TODO: 응답 타입은 entities 의 도메인 타입으로 교체하세요(여기선 폼 타입으로 대체).
+export const get{{pascalCase name}}List = async () => {
+  const { data } = await axiosInstance.get<{{pascalCase name}}FormValues[]>('/{{dashCase name}}');
+  return data;
+};
+
+export const create{{pascalCase name}} = async (input: {{pascalCase name}}FormValues) => {
+  const { data } = await axiosInstance.post<{{pascalCase name}}FormValues>('/{{dashCase name}}', input);
+  return data;
+};

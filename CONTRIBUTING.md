@@ -12,9 +12,11 @@
 
 [Conventional Commits](https://www.conventionalcommits.org/)를 따릅니다.
 
-- 타입: `feat` / `fix` / `chore` / `docs` / `refactor` / `test` / `style` 등
+- 타입: `feat` / `fix` / `chore` / `docs` / `refactor` / `test` / `style` / `perf` / `build` / `ci` / `revert`
+  (허용 목록의 정본은 `package.json`의 `commitlint.rules.type-enum` — 이 목록과 정합 유지)
 - 스코프(선택): 변경 영역을 괄호로. 예) `feat(fsd): ...`, `chore(release): ...`
-- 형식: `type(scope): subject`
+- 형식: `type(scope): subject` — subject는 대문자/sentence-case 시작 금지(`subject-case` 규칙)
+- 커밋 시 `.husky/commit-msg`의 commitlint(`@commitlint/config-conventional`, 설정은 `package.json` `commitlint` 키)가 이 형식을 **자동 강제**합니다.
 
 PR은 [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md) 양식을 채워 작성하고, 폴더 구조·네이밍·라이브러리 선택 등 결정 사항을 본문에 명시합니다.
 

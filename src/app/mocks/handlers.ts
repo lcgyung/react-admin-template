@@ -1,7 +1,8 @@
-import { HttpResponse, http } from 'msw';
+import { http, HttpResponse } from 'msw';
 
-import { mockAccounts, toUser, tokenFor } from './data';
 import type { LoginRequest } from '@/features/auth';
+
+import { mockAccounts, tokenFor, toUser } from './data';
 
 const accountFromAuthHeader = (request: Request) => {
   const auth = request.headers.get('Authorization');

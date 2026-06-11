@@ -3,3 +3,7 @@ storybook-static
 coverage
 pnpm-lock.yaml
 public/mockServiceWorker.js
+src/shared/api/generated
+
+# plop 슬라이스 템플릿(.hbs) — TS-in-Handlebars 라 prettier 파싱 대상 제외
+tools/templates

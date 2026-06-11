@@ -4,7 +4,7 @@ React + TypeScript + Vite 기반 관리자 템플릿. MUI, React Query, Zustand,
 
 ## Stack
 
-React · TypeScript · Vite · MUI · React Router · React Query · Axios · Zustand · React Hook Form · Zod · Dayjs · MSW · Vitest · ESLint · Prettier · Husky · Storybook
+React · TypeScript · Vite (SWC) · MUI · React Router · React Query · Axios · Zustand · React Hook Form · Zod · Dayjs · MSW · orval · Vitest · Playwright · ESLint · Prettier · Husky · Storybook · Sentry/Web Vitals
 
 ## Features
 
@@ -23,14 +23,14 @@ React · TypeScript · Vite · MUI · React Router · React Query · Axios · Zu
 ## Quick Start
 
 ```bash
-git clone https://github.com/<owner>/react-admin-template.git
+git clone https://github.com/lcgyung/react-admin-template.git
 cd react-admin-template
 pnpm install
 cp .env.example .env
 pnpm dev
 ```
 
-> 패키지 매니저는 **pnpm** 입니다.
+> 사전 요건: **Node ≥ 24**(`.nvmrc`) · 패키지 매니저는 **pnpm**(`pnpm@11.5.2`)입니다.
 
 기본값(`VITE_ENABLE_MOCK=true`)으로 MSW 목 API가 켜져 있어 백엔드 없이 바로 로그인할 수 있습니다.
 
@@ -47,11 +47,20 @@ pnpm dev
 ```bash
 pnpm dev              # 개발 서버
 pnpm build            # 프로덕션 빌드 (타입체크 포함)
+pnpm build:analyze    # 빌드 + 번들 분석 (ANALYZE=true → dist/stats.html)
 pnpm preview          # 빌드 미리보기
+pnpm typecheck        # 타입체크 단독 (tsc -b --noEmit)
 pnpm lint             # 린트
 pnpm lint:fsd         # FSD 아키텍처 린트 (Steiger)
-pnpm test             # 테스트
+pnpm format           # Prettier 포매팅
+pnpm gen:api          # OpenAPI 스펙 → API 타입 생성 (orval)
+pnpm gen:slice        # FSD 슬라이스 골격 생성 (plop)
+pnpm test             # 단위/컴포넌트 테스트 (Vitest)
+pnpm test:watch       # 테스트 watch 모드
+pnpm test:coverage    # 커버리지 측정 (임계값 vite.config.ts)
+pnpm test:e2e         # E2E 테스트 (Playwright)
 pnpm storybook        # Storybook (port 6006)
+pnpm build-storybook  # 정적 Storybook 빌드
 ```
 
 ## Environment
@@ -59,9 +68,12 @@ pnpm storybook        # Storybook (port 6006)
 ```env
 VITE_API_BASE_URL=http://localhost:3000
 VITE_ENABLE_MOCK=true   # MSW 목 API. 실제 백엔드 연동 시 false
+# VITE_SENTRY_DSN=      # 설정 시에만 Sentry 에러 트래킹 활성화 (미설정 시 no-op)
 ```
 
 `.env.development` / `.env.production`으로 모드별 분리. 값은 `.env.example` 참고.
+모든 `VITE_` 변수는 클라이언트 번들에 **그대로 노출**되므로 시크릿을 넣지 마세요. 환경변수는
+부팅 시 zod 스키마(`src/shared/config/env.ts`)로 검증되어, 형식 오류 시 즉시 실패합니다.
 
 ## Structure
 
@@ -90,6 +102,51 @@ export const getUsers = async () => {
 
 요청·응답 인터셉터로 토큰 주입과 401 리다이렉트를 처리합니다(인증 콜백은 `app/config/configureApi.ts`
 에서 주입). 컴포넌트는 axios를 직접 호출하지 않고 `features/*`의 React Query 훅을 거칩니다.
+
+## API 타입 생성 (orval)
+
+`openapi/admin-api.yaml`(샘플 OpenAPI 스펙)에서 `pnpm gen:api`로 API 타입과 타입 클라이언트를
+`src/shared/api/generated/`에 생성합니다(생성물 커밋). 실제 백엔드 연동 시 이 스펙을 백엔드가 제공하는
+OpenAPI 문서로 교체하세요. 도메인 모델의 단일 출처는 `entities/user`이며 생성 타입은 전송 경계에서
+소비합니다. [ADR 0004](docs/adr/0004-api-types-orval.md) 참고.
+
+## 테스트
+
+- **단위/컴포넌트** — `pnpm test` (Vitest + Testing Library, jsdom + MSW). 커버리지 임계값을
+  `vite.config.ts`에서 강제하며 CI가 검증합니다.
+- **E2E** — `pnpm test:e2e` (Playwright). 프로덕션 빌드를 preview 서버로 띄워 로그인 흐름을 검증합니다.
+  최초 1회 브라우저 설치 필요: `pnpm exec playwright install --with-deps chromium`.
+- **Lighthouse CI** — CI 에서 빌드 산출물(dist)을 정적 서빙해 접근성·SEO·모범사례(각 0.9)를 차단 게이트로,
+  성능은 warn 으로 점검합니다(임계값 정본 `lighthouserc.json`). 로컬: `pnpm build && pnpm exec lhci autorun`.
+
+## 관찰가능성
+
+`src/shared/lib/observability`에 에러 트래킹(Sentry)·웹 바이탈 수집이 env-gated 스텁으로 들어 있습니다.
+`VITE_SENTRY_DSN`을 설정하면 `@sentry/react`가 동적 로드되어 활성화됩니다(미설정 시 no-op). 렌더 에러는
+앱 루트 `ErrorBoundary`가 잡아 폴백 UI를 보여주고 `reportError`로 보고합니다.
+[ADR 0006](docs/adr/0006-observability.md) 참고.
+
+## 보안
+
+- **정적 분석** — `eslint-plugin-security` + `eslint-plugin-no-unsanitized`(DOM XSS sink 차단).
+  (CodeQL SAST 는 private 저장소 코드 스캐닝이 GHAS 를 요구해 보류 — public 전환·GHAS 도입 시 재적용.)
+- **시크릿 스캔** — gitleaks (pre-commit + CI) + 빌드 산출물(dist) 시크릿 스캔. 프론트 번들 시크릿 유출에 특히 주의합니다.
+- **의존성** — `pnpm audit`(CI, high 차단, `--prod`) + osv-scanner(교차검증, 비차단) + Dependabot 주간 업데이트(`.github/dependabot.yml`).
+- **보안 헤더 / CSP** — `nginx.conf`(정본)와 vite preview 에 실용 베이스라인 CSP +
+  `X-Frame-Options`/`Referrer-Policy`/`Permissions-Policy`/`nosniff` 적용([ADR 0007](docs/adr/0007-security-headers-csp.md)).
+- **프로덕션 빌드** — `console`/`debugger` 제거(`vite.config.ts`). 오픈 리다이렉트는 `isInternalPath` 가드로 내부 경로만 허용.
+- 위협 모델·의도된 트레이드오프·취약점 신고 절차는 [`SECURITY.md`](SECURITY.md), 토큰 저장
+  트레이드오프는 [ADR 0005](docs/adr/0005-token-storage.md) 참고.
+
+## 배포
+
+`Dockerfile` + `nginx.conf`(SPA fallback·보안 헤더 포함)로 컨테이너 배포합니다. 정적 호스팅
+(Netlify/Cloudflare Pages 등)도 `pnpm build` → `dist` 정적 서빙으로 동작하지만, 이 경우 SPA
+fallback 리라이트와 보안 헤더(`nginx.conf` 참고)를 해당 호스팅 설정으로 옮겨야 합니다.
+
+## 아키텍처 결정 기록 (ADR)
+
+상태 관리·FSD·API 타입·토큰 저장·관찰가능성 등 주요 결정의 배경은 [docs/adr/](docs/adr/)에 기록합니다.
 
 ## Contributing
 

@@ -3,10 +3,11 @@ import LightModeIcon from '@mui/icons-material/LightMode';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { AppBar, Chip, IconButton, Toolbar, Tooltip, Typography } from '@mui/material';
 
-import { DRAWER_WIDTH } from './Sidebar';
 import { useLogout } from '@/features/auth';
-import { useAuthStore } from '@/entities/session';
 import { useThemeStore } from '@/features/theme';
+import { useAuthStore } from '@/entities/session';
+
+import { DRAWER_WIDTH } from './Sidebar';
 
 export const Header = () => {
   const user = useAuthStore((s) => s.user);

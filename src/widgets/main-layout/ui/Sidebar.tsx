@@ -1,6 +1,7 @@
+import { NavLink } from 'react-router-dom';
+import type { SvgIconComponent } from '@mui/icons-material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import PeopleIcon from '@mui/icons-material/People';
-import type { SvgIconComponent } from '@mui/icons-material';
 import {
   Box,
   Drawer,
@@ -11,11 +12,10 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material';
-import { NavLink } from 'react-router-dom';
 
-import { paths } from '@/shared/config';
 import { useAuthStore } from '@/entities/session';
 import type { Role } from '@/entities/user';
+import { paths } from '@/shared/config';
 
 export const DRAWER_WIDTH = 240;
 

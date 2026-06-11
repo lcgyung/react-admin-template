@@ -1,6 +1,7 @@
-import { axiosInstance } from '@/shared/api';
-import type { LoginRequest, LoginResponse } from '../model/types';
 import type { User } from '@/entities/user';
+import { axiosInstance } from '@/shared/api';
+
+import type { LoginRequest, LoginResponse } from '../model/types';
 
 export const login = async (payload: LoginRequest) => {
   const { data } = await axiosInstance.post<LoginResponse>('/auth/login', payload);
