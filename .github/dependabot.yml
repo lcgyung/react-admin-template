@@ -1,12 +1,12 @@
 version: 2
 updates:
-  # npm(pnpm-lock.yaml) 의존성 — 주간. minor/patch 는 묶어서 PR 노이즈를 줄인다.
+  # npm(pnpm-lock.yaml) 의존성 — 월간. minor/patch 는 묶어서 PR 노이즈를 줄인다.
   - package-ecosystem: npm
     directory: '/'
     # 의존성 업데이트 PR 은 dev 로 보낸다 — main 에는 dev→main 통합 PR 만 올린다.
     target-branch: dev
     schedule:
-      interval: weekly
+      interval: monthly
     open-pull-requests-limit: 10
     # 공급망 age-gate 정합 — pnpm 11 의 minimumReleaseAge(1일, pnpm-workspace.yaml 에 명시)보다 어린
     # 버전은 install 이 막힌다. 릴리스 후 N일 소킹한 뒤 PR 을 열어 "갓 게시 버전" 이 게이트에 걸리는
@@ -24,9 +24,13 @@ updates:
           - minor
           - patch
 
-  # GitHub Actions 워크플로의 액션 버전 — 주간.
+  # GitHub Actions 워크플로의 액션 버전 — 월간. 전부 한 PR 로 묶어 노이즈를 줄인다.
   - package-ecosystem: github-actions
     directory: '/'
     target-branch: dev
     schedule:
-      interval: weekly
+      interval: monthly
+    groups:
+      github-actions:
+        patterns:
+          - '*'
