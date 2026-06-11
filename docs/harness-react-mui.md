@@ -11,7 +11,7 @@
 
 ## 1. 컨텍스트 레이어
 
-- [x] 🔴 `CLAUDE.md` (또는 `AGENTS.md`) — 빌드·테스트·실행 명령, 컴포넌트 컨벤션, "하지 말 것" — `CLAUDE.md` (+ `.claude/` 훅·에이전트·스킬)
+- [x] 🔴 `CLAUDE.md` (또는 `AGENTS.md`) — 빌드·테스트·실행 명령, 컴포넌트 컨벤션, "하지 말 것" — `CLAUDE.md`(코어) + `.claude/rules/`(path-scoped 주제별 규칙 — 매칭 파일 작업 시 자동 로드, 구버전 Claude Code 는 수동 참조) + `.claude/` 훅·에이전트·스킬
 - [x] 🔴 `README` + 화면/라우팅 구조 개요 — `README.md`
 - [x] 🟡 `docs/adr/` — 상태관리·라우팅 등 주요 결정 기록 — ADR 0001~0007 (상태관리·FSD·orval·토큰 저장·관찰가능성·CSP)
 - [x] 🟡 컴포넌트 디렉터리 규칙 (feature 단위 / atomic 등 명시) — FSD 6레이어, `steiger.config.ts` + `pnpm lint:fsd` 하드 강제

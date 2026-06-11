@@ -66,9 +66,9 @@
 
 ## 7. CI/CD 보안 게이트
 
-- [x] 🔴 PR 게이트 — lint(security) · 시크릿 · SCA · e2e · Lighthouse — `ci.yml` (SAST 는 private+GHAS 부재로 보류)
+- [x] 🔴 PR 게이트 — lint(security) · 시크릿(§0) · SCA(§0) · e2e · Lighthouse — `ci.yml` (SAST 는 private+GHAS 부재로 보류)
 - [ ] 🔴 브랜치 보호 + 필수 리뷰 — `.github/CODEOWNERS` 제공 + 권장설정 문서화. GitHub 브랜치 보호 토글은 저장소 관리자 설정(아래 참고)
-- [x] 🟡 빌드 산출물 시크릿 스캔 — `ci.yml` "Scan build output for secrets"
+- [x] 🟡 빌드 산출물 시크릿 스캔 — §2 와 동일 항목(중복 기재 방지를 위해 §2 참조)
 - [ ] 🟡 에러 트래킹 (Sentry) — source map 비공개 업로드, PII 스크러빙 — 부분: PII 스크러빙 O(`sentry.ts`), 소스맵 업로드는 통합자(SENTRY_AUTH_TOKEN)
 - [ ] 🟢 서명 커밋 — 선택(개발자 환경 설정)
 
