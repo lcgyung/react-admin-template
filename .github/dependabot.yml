@@ -8,6 +8,14 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 10
+    # 공급망 age-gate 정합 — pnpm 11 의 minimumReleaseAge(1일, pnpm-workspace.yaml 에 명시)보다 어린
+    # 버전은 install 이 막힌다. 릴리스 후 N일 소킹한 뒤 PR 을 열어 "갓 게시 버전" 이 게이트에 걸리는
+    # 전이적 CI 실패(예: #23 @mui 9.1.1)를 원천 제거한다. 메이저는 더 길게 소킹(초기 릴리스 버그 회피).
+    cooldown:
+      default-days: 3
+      semver-major-days: 7
+      semver-minor-days: 3
+      semver-patch-days: 2
     groups:
       minor-and-patch:
         patterns:

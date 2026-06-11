@@ -2,6 +2,10 @@ allowBuilds:
   '@swc/core': true
   esbuild: true
   msw: true
+# 공급망 보안 — 갓 게시된(잠재 탈취) 버전 설치를 지연한다. pnpm 11 의 기본값(1440분=1일)을 명시 고정해
+# dependabot cooldown(.github/dependabot.yml)과의 정합을 코드로 드러낸다(pnpm 10-는 기본 0 이라 버전 의존
+# 묵시값을 신뢰하지 않는다). 신뢰 패키지의 즉시 설치가 필요하면 minimumReleaseAgeExclude 로 예외 관리.
+minimumReleaseAge: 1440
 onlyBuiltDependencies:
   - '@swc/core'
   - esbuild
