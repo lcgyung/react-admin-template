@@ -15,7 +15,7 @@ const SECURITY_HEADERS = {
 };
 
 // https://vite.dev/config/
-export default defineConfig(({ command }) => ({
+export default defineConfig({
   plugins: [
     react(),
     // 번들 분석 — `pnpm build:analyze`(ANALYZE=true) 일 때만 dist/stats.html 생성(gitignore).
@@ -26,8 +26,13 @@ export default defineConfig(({ command }) => ({
   // dev/preview 서버: CSP 없이 공통 보안 헤더만 적용(CSP 정본은 nginx.conf).
   server: { headers: SECURITY_HEADERS },
   preview: { headers: SECURITY_HEADERS },
-  // 프로덕션 번들에서 console/debugger 제거 — 정보 노출·디버그 흔적 차단(dev/test 는 유지).
-  esbuild: { drop: command === 'build' ? ['console', 'debugger'] : [] },
+  // 프로덕션 번들에서 console/debugger 제거 — 정보 노출·디버그 흔적 차단.
+  // vite8 기본 트랜스포머(oxc)는 esbuild 의 `drop` 을 지원하지 않으므로, build 시 terser 미니파이어로
+  // drop_console/drop_debugger 를 적용한다. minify 는 build 에서만 동작하므로 dev/test 는 console 유지.
+  build: {
+    minify: 'terser',
+    terserOptions: { compress: { drop_console: true, drop_debugger: true } },
+  },
   resolve: {
     alias: {
       '@': path.resolve(import.meta.dirname, './src'),
@@ -59,14 +64,15 @@ export default defineConfig(({ command }) => ({
         'src/features/theme/model/tokens.ts',
         'src/features/theme/model/createAppTheme.ts',
       ],
-      // ratchet floor — 실측 베이스라인(stmts/lines 23.06·branch 57.44·funcs 47.82) 바로 아래로
-      // 고정해 회귀를 막고, PR마다 점진 상향한다. 미달 시 vitest 가 non-zero 로 종료 → CI 실패.
+      // ratchet floor — vitest4 의 coverage-v8 는 AST-aware 카운팅으로 측정 방식이 바뀌어 베이스라인이
+      // 재보정됨(stmts 36.03·lines 37.83·branch 40.5·funcs 25.77). 같은 테스트·파일셋이지만 stmts/lines 는
+      // 상향, funcs/branches 는 더 엄격해져 하락(품질 저하 아닌 측정 변경). 실측 바로 아래로 고정해 회귀를 막고 PR마다 상향.
       thresholds: {
-        lines: 22,
-        statements: 22,
-        functions: 45,
-        branches: 55,
+        lines: 36,
+        statements: 35,
+        functions: 24,
+        branches: 39,
       },
     },
   },
-}));
+});
