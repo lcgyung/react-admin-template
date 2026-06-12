@@ -67,7 +67,10 @@ export default tseslint.config(
       globals: globals.browser,
     },
     // function-component-definition 룰만 켜기 위해 react 플러그인을 등록한다(recommended 미확장).
-    settings: { react: { version: 'detect' } },
+    // version 은 'detect' 대신 설치 버전(19.2)으로 고정한다 — ESLint 10 에서 plugin-react 의 버전
+    // 탐지 경로(resolveBasedir → 제거된 context.getFilename())가 크래시하므로 탐지를 건너뛴다.
+    // 우리가 켠 react 룰은 버전 무관(function-component-definition)이라 고정값이 판정을 바꾸지 않는다.
+    settings: { react: { version: '19.2' } },
     plugins: {
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
