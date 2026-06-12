@@ -1,0 +1,8 @@
+# staged 변경에 시크릿이 없는지 검사(gitleaks 미설치 시 건너뜀 — CI 에서 강제).
+if command -v gitleaks >/dev/null 2>&1; then
+  gitleaks protect --staged --redact --no-banner
+else
+  echo "ℹ️  gitleaks 미설치 — staged 시크릿 스캔 건너뜀(설치 권장: https://github.com/gitleaks/gitleaks)"
+fi
+
+pnpm lint-staged
