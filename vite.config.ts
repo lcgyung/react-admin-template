@@ -44,6 +44,10 @@ export default defineConfig({
     setupFiles: './vitest.setup.ts',
     css: false,
     passWithNoTests: false,
+    // MUI 9 의 ESM 산출물(@mui/material/internal/Transition.mjs)이 확장자 없는 서브패스
+    // `react-transition-group/TransitionGroupContext` 를 import 하는데, vitest 의 node ESM 리졸버는
+    // 이를 디렉터리 import 로 보고 실패한다. 두 패키지를 inline 해 vite 리졸버로 변환·해석한다.
+    server: { deps: { inline: ['@mui/material', 'react-transition-group'] } },
     // 단위/컴포넌트 테스트는 src 한정. e2e/*.spec.ts(Playwright)는 vitest 대상에서 제외.
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
     coverage: {

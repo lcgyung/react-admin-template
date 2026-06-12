@@ -24,10 +24,10 @@ export const LoginPage = () => {
   return (
     <Card sx={{ width: '100%', maxWidth: 400 }}>
       <CardContent>
-        <Typography variant="h5" fontWeight={700} gutterBottom>
+        <Typography variant="h5" gutterBottom sx={{ fontWeight: 700 }}>
           로그인
         </Typography>
-        <Typography variant="body2" color="text.secondary" mb={3}>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
           React Admin Template
         </Typography>
 

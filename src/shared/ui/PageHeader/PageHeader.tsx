@@ -18,7 +18,7 @@ export const PageHeader = ({ title, description, action }: PageHeaderProps) => (
     }}
   >
     <Box>
-      <Typography variant="h5" fontWeight={700}>
+      <Typography variant="h5" sx={{ fontWeight: 700 }}>
         {title}
       </Typography>
       {description && (
