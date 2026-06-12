@@ -1,0 +1,30 @@
+allowBuilds:
+  '@swc/core': true
+  esbuild: true
+  msw: true
+# 공급망 보안 — 갓 게시된(잠재 탈취) 버전 설치를 지연한다. pnpm 11 의 기본값(1440분=1일)을 명시 고정해
+# dependabot cooldown(.github/dependabot.yml)과의 정합을 코드로 드러낸다(pnpm 10-는 기본 0 이라 버전 의존
+# 묵시값을 신뢰하지 않는다).
+#
+# 불변식: 이 gate(1440분=1일) ≤ min(dependabot cooldown days)=semver-patch-days(2일). 이 값을 올리면
+# dependabot cooldown 최저값도 함께 올려야 dependabot 제안이 게이트에 안 걸린다(.github/dependabot.yml 참조).
+# 주의: gate 는 dependabot 뿐 아니라 모든 install(수동 범프·CI 포함)에 적용된다. 24h 미만 버전을 수동으로
+# 올리면 CI install 이 ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION 으로 막힌다(#28) — 운영 규약은
+# .claude/rules/security.md '공급망 — 의존성 유휴기간' 참조. 신뢰·긴급 패키지는 minimumReleaseAgeExclude 로 한시 예외.
+minimumReleaseAge: 1440
+# 한시 예외(TEMP) — #28(MUI v9 수동 마이그레이션)이 갓 게시된 9.1.1을 올려 24h 게이트(#28)에 걸렸다.
+# 정확한 버전만 예외라 미래 @mui 버전은 계속 게이트 보호된다. 9.1.1 게시 +24h(2026-06-12 06:37 UTC)
+# 이후엔 게이트를 자연 통과하므로 이 블록은 무력해진다 → 그 시점에 제거(제로베이스 복원).
+minimumReleaseAgeExclude:
+  - '@mui/material@9.1.1'
+  - '@mui/icons-material@9.1.1'
+  - '@mui/system@9.1.1'
+  - '@mui/utils@9.1.1'
+  - '@mui/types@9.1.1'
+  - '@mui/private-theming@9.1.1'
+  - '@mui/styled-engine@9.1.1'
+  - '@mui/core-downloads-tracker@9.1.1'
+onlyBuiltDependencies:
+  - '@swc/core'
+  - esbuild
+  - msw
