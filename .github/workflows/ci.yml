@@ -1,0 +1,151 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Lint FSD (Steiger)
+        run: pnpm lint:fsd
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test (with coverage threshold)
+        run: pnpm test:coverage
+
+      - name: Build
+        run: pnpm build
+
+      # 빌드 산출물 시크릿 스캔 — 번들(dist)에 개인키·클라우드 키·토큰 시그니처가
+      # 섞여 들어가지 않았는지 확인한다(프론트 번들은 전량 공개되므로 특히 중요).
+      # 대안: gitleaks dir --no-git ./dist (바이너리 설치 필요).
+      - name: Scan build output for secrets
+        run: |
+          if grep -REn \
+            -e 'BEGIN (RSA |EC |DSA |OPENSSH |PGP )?PRIVATE KEY' \
+            -e 'AKIA[0-9A-Z]{16}' \
+            -e 'xox[baprs]-[0-9A-Za-z-]{10,}' \
+            -e 'gh[pousr]_[0-9A-Za-z]{30,}' \
+            dist; then
+            echo "::error::빌드 산출물(dist)에서 시크릿 시그니처가 발견되었습니다."
+            exit 1
+          fi
+          echo "dist 시크릿 스캔 통과 — 시그니처 매치 없음."
+
+  security:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # 시크릿 스캔(전체 git 히스토리) — gitleaks-action 은 organization private 에서
+      # GITLEAKS_LICENSE 를 요구하고 PR fetch 시 GITHUB_TOKEN 권한에 묶인다. osv-scanner(아래)와
+      # 동일하게 핀 고정 CLI(Docker)로 교체해 라이선스/권한 의존 없이 히스토리를 스캔한다.
+      # pre-commit(gitleaks protect)·build 잡 dist grep 과 함께 다층 방어. 누출 시 exit 1 로 차단.
+      - name: Secret scan (gitleaks, 전체 히스토리)
+        run: |
+          docker run --rm -v "${{ github.workspace }}:/repo" \
+            ghcr.io/gitleaks/gitleaks:v8.30.1 \
+            git /repo --redact --no-banner --config=/repo/.gitleaks.toml
+
+      # high/critical 만 차단, devDependency advisory(번들 미포함)는 --prod 로 제외.
+      - name: Audit dependencies (SCA)
+        run: pnpm audit --audit-level high --prod
+
+      # OSV 교차검증 — advisory DB 다양성 확보용. 비차단(보고용).
+      # google/osv-scanner-action 은 SARIF 업로드(코드 스캐닝)를 전제로 하는데, private 저장소는
+      # GHAS 없이는 업로드가 막힌다. 따라서 핀 고정 CLI(Docker)로 결과를 로그에만 남긴다.
+      - name: osv-scanner (SCA 교차검증, 비차단)
+        continue-on-error: true
+        run: docker run --rm -v "${{ github.workspace }}:/src" ghcr.io/google/osv-scanner:v2.3.8 scan -L /src/pnpm-lock.yaml
+
+  e2e:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: E2E (Playwright)
+        run: pnpm test:e2e
+
+  # Lighthouse — 빌드 산출물(dist)을 lhci 가 정적 서빙해 a11y/best-practices/seo(0.9) 를 차단 게이트로,
+  # performance 는 환경 편차가 커 warn 으로만 둔다. 임계값 정본은 lighthouserc.json.
+  lighthouse:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      - name: Run Lighthouse CI
+        run: pnpm exec lhci autorun

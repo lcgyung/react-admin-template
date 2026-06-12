@@ -1,0 +1,112 @@
+version: 2
+updates:
+  # npm(pnpm-lock.yaml) 의존성 — 월간. minor/patch 는 한 PR 로 묶고(노이즈↓),
+  # peer-coupled 패밀리의 메이저는 패밀리별로 묶는다(호환성, 아래 groups 참조).
+  - package-ecosystem: npm
+    directory: '/'
+    # 의존성 업데이트 PR 은 dev 로 보낸다 — main 에는 dev→main 통합 PR 만 올린다.
+    target-branch: dev
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 10
+    # 공급망 age-gate 정합 — pnpm 11 의 minimumReleaseAge(1일, pnpm-workspace.yaml 에 명시)보다 어린
+    # 버전은 install 이 막힌다. 릴리스 후 N일 소킹한 뒤 PR 을 열어 "갓 게시 버전" 이 게이트에 걸리는
+    # 전이적 CI 실패(예: #23 @mui 9.1.1)를 원천 제거한다. 메이저는 더 길게 소킹(초기 릴리스 버그 회피).
+    #
+    # 불변식: min(cooldown days)=semver-patch-days(2일) ≥ minimumReleaseAge(1440분=1일).
+    # cooldown 최저값은 항상 gate 이상이어야 dependabot 제안이 install 게이트에 안 걸린다.
+    # gate(pnpm-workspace.yaml minimumReleaseAge)를 올리면 semver-patch-days 도 함께 올릴 것.
+    cooldown:
+      default-days: 3
+      semver-major-days: 7
+      semver-minor-days: 3
+      semver-patch-days: 2
+    # peer 메이저 호환성 — peer-coupled 패밀리는 메이저를 한 PR 로 묶는다(update-types: major).
+    # 단독 메이저 PR 이 peer 를 깨는 #23 류(@mui/material 만 9, icons-material 은 6)를 원천 차단.
+    # minor/patch 는 그룹 밖이라 아래 minor-and-patch 단일 PR 로 빠진다(노이즈·lockstep 보존).
+    # 그룹 밖 단일 패키지(axios·react-router-dom·typescript·zod 등)의 메이저는 개별 PR(개별 검토).
+    groups:
+      react-major:
+        patterns:
+          - react
+          - react-dom
+          - '@types/react'
+          - '@types/react-dom'
+        update-types:
+          - major
+      mui-major:
+        patterns:
+          - '@mui/*'
+          - '@emotion/*'
+        update-types:
+          - major
+      storybook-major:
+        patterns:
+          - storybook
+          - '@storybook/*'
+          - eslint-plugin-storybook
+        update-types:
+          - major
+      tanstack-major:
+        patterns:
+          - '@tanstack/*'
+        update-types:
+          - major
+      vite-major:
+        patterns:
+          - vite
+          - vitest
+          - '@vitest/*'
+          - '@vitejs/*'
+        update-types:
+          - major
+      eslint-major:
+        patterns:
+          - eslint
+          - '@eslint/*'
+          - 'eslint-config-*'
+          - 'eslint-plugin-*'
+          - typescript-eslint
+          - globals
+        update-types:
+          - major
+      commitlint-major:
+        patterns:
+          - '@commitlint/*'
+        update-types:
+          - major
+      testing-library-major:
+        patterns:
+          - '@testing-library/*'
+        update-types:
+          - major
+      react-hook-form-major:
+        patterns:
+          - react-hook-form
+          - '@hookform/*'
+        update-types:
+          - major
+      steiger-major:
+        patterns:
+          - steiger
+          - '@feature-sliced/*'
+        update-types:
+          - major
+      # 그 외 전부 — 모든 패키지의 minor/patch 를 한 PR 로(노이즈 최소화·lockstep 보존).
+      minor-and-patch:
+        patterns:
+          - '*'
+        update-types:
+          - minor
+          - patch
+
+  # GitHub Actions 워크플로의 액션 버전 — 월간. 전부 한 PR 로 묶어 노이즈를 줄인다.
+  - package-ecosystem: github-actions
+    directory: '/'
+    target-branch: dev
+    schedule:
+      interval: monthly
+    groups:
+      github-actions:
+        patterns:
+          - '*'
