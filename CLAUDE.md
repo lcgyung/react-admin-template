@@ -6,6 +6,18 @@
 빠른 시작·데모 계정 등 개요는 [`README.md`](README.md)를 참고하세요. 이 문서는 모든 세션에
 필요한 코어(명령어·구조·gotcha)만 담고, 주제별 상세 규칙은 `.claude/rules/`가 맡습니다(아래 인덱스).
 
+## 언어 규칙
+
+이 리포는 한국어 보일러플레이트다. Claude Code는 **모든 응답·코드 주석·문서·커밋/PR 설명을
+한글로 통일**한다(한영 혼용 금지). 단, 다음은 영문을 유지한다:
+
+- 커밋/PR 제목의 Conventional Commits 접두어 `type(scope):` — `feat`/`fix`/`chore` 등은
+  `package.json` `commitlint` `type-enum`이 영문으로 강제하므로 그대로 둔다. **subject·body·PR
+  본문만 한글**로 작성한다. 예: `chore(hooks): permission_mode 기반 하네스 분기 정비`.
+- 코드 식별자(변수·함수·타입명), 라이브러리/API/명령어 이름, 표준 기술 용어.
+
+> commitlint `subject-case`(대문자/sentence-case 시작 금지)와 충돌하지 않는다(한글은 해당 없음).
+
 ## 패키지 매니저
 
 이 프로젝트는 **pnpm**(`pnpm-workspace.yaml`, `pnpm-lock.yaml` 추적)을 사용합니다. npm/yarn 대신
