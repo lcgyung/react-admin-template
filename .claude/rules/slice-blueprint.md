@@ -61,6 +61,14 @@ paths:
 - `model/types.ts` — 도메인 타입 + `ROLES` 류 단일소스 상수(`as const`).
 - `@x/<other>.ts` — 다른 entity에 타입을 노출하는 크로스임포트(예: `entities/user/@x/session`).
 
+**검증 정책 — entity 는 타입 전용 레이어다.** 별도 테스트/검증 하네스를 두지 않는다(FSD 레이어 정책).
+
+- entity 슬라이스는 **타입 전용** → `*.test.ts` 단위 테스트 **비대상**(인터페이스엔 실행 코드가 없다).
+- 적합성 게이트 = `tsc` + `src/app/mocks/data.ts` 의 **타입드 시드 리터럴**(엔티티 타입에 고정된 시드가
+  타입 위반 시 컴파일 실패 — 컴파일타임 적합성 검사) + steiger `insignificant-slice`(소비처 1개 이상 보장).
+- **런타임/zod 검증은 entity 가 아니라 feature 연동 시** `model/*Schema.ts`·api 경계에서 한다.
+- 예외: `session` 처럼 **런타임 로직(스토어·헬퍼)을 가진 슬라이스만** `*.test.ts` 대상이다.
+
 ## shared (`src/shared/<segment>/`)
 
 세그먼트 배럴로만 노출: `@/shared/api`, `@/shared/config`, `@/shared/ui/<Name>`, `@/shared/lib/<name>`.

@@ -13,13 +13,17 @@ paths:
 
 # 테스트 & 목 API 규칙
 
-## 목 API (MSW)
+## 목 API (MSW) — 테스트 전용 + 데모 옵트인
 
-- `VITE_ENABLE_MOCK=true` 일 때 `src/main.tsx`가 MSW 워커를 기동한다.
-- 핸들러는 `src/app/mocks/handlers.ts`(로그인/로그아웃/me/users), 시드 데이터는 `src/app/mocks/data.ts`.
-- 테스트에서는 `src/app/mocks/server.ts`(setupServer)를 `vitest.setup.ts`가 기동한다 —
+MSW 는 데모 백엔드가 아니라 **테스트/데모 픽스처**다(백엔드-우선 워크플로, [ADR 0011](../../docs/adr/0011-backend-first-workflow.md)).
+
+- **단위/컴포넌트 테스트**: `vitest.setup.ts`가 `src/app/mocks/server.ts`(setupServer)를 **항상** 기동한다 —
   테스트에서 네트워크를 직접 스텁하지 말고 MSW 핸들러를 경유한다.
-- 데모 계정과 환경 변수(`VITE_ENABLE_MOCK` / `VITE_API_BASE_URL`)는 `README.md` 와 `.env.example` 참고.
+- **데모 모드(옵트인)**: 기본(dev/preview/`pnpm build`)은 MSW OFF(실 백엔드 전제). 백엔드 없이 띄우려면
+  `vite --mode demo`/`pnpm build:demo`(`.env.demo`의 `VITE_ENABLE_MOCK=true`) — `src/main.tsx`가 워커를 기동한다.
+  e2e(Playwright)·lighthouse CI 가 이 모드를 쓴다.
+- 핸들러는 `src/app/mocks/handlers.ts`(로그인/로그아웃/me/users 샘플), 시드는 `src/app/mocks/data.ts`.
+- 데모 계정·환경 변수는 `README.md` 와 `.env.demo`/`.env.example` 참고.
 
 ## 실행
 

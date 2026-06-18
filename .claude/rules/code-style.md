@@ -26,9 +26,15 @@ paths:
   배열 리터럴을 하드코딩하지 않는다. `local/query-key-object`가 `queryKey: [...]` 리터럴을 **error로 차단**한다.
 - **enum 단일 출처** — `Role` 등 도메인 값은 `entities`의 `ROLES`(`entities/user`)를 단일 출처로
   재사용한다(`z.enum(ROLES)`). 문자열 배열 중복 정의 금지.
-- **MUI 스타일** — 색·간격·타이포는 theme 토큰(`sx`/`styled`, `theme.spacing()`)을 사용한다.
-  하드코딩 `#hex`는 `no-restricted-syntax`가 **error로 차단**한다(theme 토큰 단일소스·스토리는 예외).
-  `px`는 권장 차원. 인라인 `style` 대신 `sx`를 쓰고, `sx`에 매 렌더 새 객체를 남발하지 않는다(불필요한 리렌더 방지).
+- **MUI 스타일** — 색·간격·타이포는 theme 토큰(`sx`/`styled`, `theme.spacing()`)을 사용한다. 정책 정본은
+  [ADR 0010](../../docs/adr/0010-design-theme-system.md). `no-restricted-syntax`가 토큰 우회를 **error로 차단**한다
+  (theme 토큰 단일소스 `tokens.ts`·스토리는 예외):
+  - 색: 하드코딩 `#hex`와 `rgb()`/`hsl()` 리터럴 금지 → `theme.palette.*` 시맨틱 토큰(`primary.main`,
+    `text.secondary` 등). named color(`'red'`)·magic px는 린트 미차단이니 리뷰가 받는다.
+  - 타이포: 인라인 `fontWeight`/`fontSize` 금지 → `<Typography variant>`. 새 스케일이 필요하면 컴포넌트에
+    박지 말고 `features/theme/model/tokens.ts`에 variant를 추가한다(h4/h6 토큰화가 선례).
+  - 인라인 `style` prop 금지 → `sx`(불가피하면 `eslint-disable`). `sx`에 매 렌더 새 객체를 남발하지 않는다(리렌더 방지).
+  - 레이아웃 수치(`DRAWER_WIDTH` 등)는 토큰화 대상이 아니라 해당 슬라이스의 모듈 상수로 둔다(테마 스키마 오염 방지).
 - **접근성(a11y)** — `eslint-plugin-jsx-a11y` recommended를 강제한다. 인터랙티브 요소의
   label/aria/role·키보드 접근 위반은 린트에서 막힌다.
 - **JSDoc 범위** — JSDoc/주석은 공개 API(배럴로 노출되는 함수·훅)와 비자명한 로직·함정(gotcha)에

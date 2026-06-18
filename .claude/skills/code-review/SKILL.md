@@ -7,7 +7,14 @@ description: React + MUI 변경에 대한 프론트엔드 리뷰 기준. 테마 
 
 ## 스타일 / 테마
 
-- 색·간격·타이포는 theme 토큰을 쓰는가(하드코딩 #hex/px 지양).
+ESLint(`no-restricted-syntax`)가 #hex/rgb/hsl 색·인라인 fontWeight/fontSize·인라인 style을 이미 error로 막는다
+(정책: ADR 0010). 리뷰는 **린트가 못 막는 회색지대를 받는 마지막 그물**이다.
+
+- 색이 `theme.palette.*` 시맨틱 토큰(`primary.main`/`text.secondary` 등)을 거치는가 — named color(`'red'`)나
+  부정확한 시맨틱 키 사용은 린트가 못 잡으니 리뷰가 잡는다.
+- 타이포가 `variant`를 쓰는가, 인라인 가중치/크기 우회가 없는가. 신규 스케일은 컴포넌트가 아니라
+  `tokens.ts` variant에 추가했는가.
+- magic px가 의미 있는 상수/`spacing()` index로 표현됐는가(린트 미차단 영역).
 - 인라인 style 대신 sx/styled를 쓰는가. sx에 매 렌더 새 객체 남발이 없는가.
 
 ## 컴포넌트 설계

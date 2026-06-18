@@ -35,6 +35,7 @@ pnpm preview                     # 빌드 산출물 로컬 미리보기
 pnpm lint                        # eslint .
 pnpm lint:fsd                    # steiger ./src — FSD 레이어/Public API 규칙 (CI·Stop 게이트가 사용)
 pnpm format                      # prettier --write .
+pnpm knip                        # dead code/unused export 탐지 (Pattern Contamination)
 
 pnpm test                        # 단위/컴포넌트 테스트 (vitest run, jsdom)
 pnpm test:watch                  # watch 모드
@@ -80,29 +81,31 @@ side-effect import(`@/app/config/configureApi`)를 **제거하면 타입 에러 
 주제별 상세 규칙은 path-scoped rules로 분리되어, 매칭 파일 작업 시 자동 로드됩니다.
 paths에 안 걸리는 작업에서 해당 주제를 다루면 직접 Read 하세요.
 
-| 파일                                                     | 내용                                               | 자동 로드 조건                            |
-| -------------------------------------------------------- | -------------------------------------------------- | ----------------------------------------- |
-| [fsd-architecture.md](.claude/rules/fsd-architecture.md) | FSD 의존성·상태관리(React Query/Zustand)·인증/RBAC | `src/**`                                  |
-| [slice-blueprint.md](.claude/rules/slice-blueprint.md)   | 슬라이스 구현 골격·`gen:slice` 체크리스트          | `src/{features,entities,shared}/**`, plop |
-| [code-style.md](.claude/rules/code-style.md)             | 컨벤션 해설(정본은 `eslint.config.js`)             | `src/**/*.ts(x)`, `.storybook/**`         |
-| [security.md](.claude/rules/security.md)                 | XSS·리다이렉트·CSP 정본 위치·시크릿 스캔           | `src/**`, `nginx.conf`, CI 워크플로 등    |
-| [testing.md](.claude/rules/testing.md)                   | MSW·커버리지 ratchet·테스트 실행법                 | 테스트·mocks·vitest/playwright 설정       |
+| 파일                                                               | 내용                                                                | 자동 로드 조건                            |
+| ------------------------------------------------------------------ | ------------------------------------------------------------------- | ----------------------------------------- |
+| [fsd-architecture.md](.claude/rules/fsd-architecture.md)           | FSD 의존성·상태관리(React Query/Zustand)·인증/RBAC                  | `src/**`                                  |
+| [slice-blueprint.md](.claude/rules/slice-blueprint.md)             | 슬라이스 구현 골격·`gen:slice` 체크리스트                           | `src/{features,entities,shared}/**`, plop |
+| [code-style.md](.claude/rules/code-style.md)                       | 컨벤션 해설(정본은 `eslint.config.js`)                              | `src/**/*.ts(x)`, `.storybook/**`         |
+| [security.md](.claude/rules/security.md)                           | XSS·리다이렉트·CSP 정본 위치·시크릿 스캔                            | `src/**`, `nginx.conf`, CI 워크플로 등    |
+| [testing.md](.claude/rules/testing.md)                             | MSW·커버리지 ratchet·테스트 실행법                                  | 테스트·mocks·vitest/playwright 설정       |
+| [pattern-contamination.md](.claude/rules/pattern-contamination.md) | ELEMENT 1: 경쟁 패턴 통일·dead code 제거·`chore(cleanup)` 분리 커밋 | `src/**`                                  |
 
 ## Claude Code 자동화 (`.claude/`)
 
 `.claude/settings.json` 이 훅을 등록한다. 코드를 만질 때 아래 동작을 전제로 한다.
 
-- **SessionStart** → `session-context.sh`: 현재 브랜치를 컨텍스트로 주입.
+- **SessionStart** → `session-context.sh`(현재 브랜치 주입) + `contamination-report.sh`(knip 으로 dead code/unused export 후보를 "오염 맵"으로 주입 — 탐지·인지 전용, 옵트인 `CC_CONTAMINATION_REPORT=1`. 캐시·타임아웃·미설치 시 비차단. 정책 정본 `.claude/rules/pattern-contamination.md`).
 - **PreToolUse(Bash)** → `guard-bash.sh`: 파괴적 명령(`rm -rf /`, force push, `reset --hard` 등)을 차단.
   acceptEdits/bypassPermissions 모드에서는 추가 규칙(`git clean -f`, `curl|sh` 파이프 실행,
   `git checkout/restore .`)을 강화 — 사용자 확인이 줄어드는 모드일수록 훅이 보상 통제.
   `permission_mode`를 못 읽으면(빈/미지 값) 강화 규칙을 적용한다 — 판단 불가 시 강하게(fail-closed).
 - **PostToolUse(Edit/Write)** → `format-changed-file.sh`: 변경된 `*.ts(x)` 에 `eslint --fix` + `prettier` 자동 적용.
 - **Stop** → `gate.sh`: 세션 종료 전 `tsc -b --noEmit` + `eslint .` + `prettier --check .` + `steiger ./src`(FSD) + `vitest run` 게이트. 실패하면 `exit 2` 로 계속 수정을 유도한다. `stop_hook_active` 무한루프 가드 포함. plan mode(`permission_mode == "plan"`)에서는 변경분이 없으므로 스킵.
-- `.claude/agents/code-reviewer.md`(리뷰 실행 서브에이전트), `.claude/skills/code-review/`(리뷰 기준)가 함께 제공된다.
+- `.claude/agents/code-reviewer.md`(리뷰 실행 서브에이전트), `.claude/skills/code-review/`(리뷰 기준),
+  `.claude/skills/contamination-sweep/`(전체 코드베이스 Pattern Contamination 정기 스윕 — 전용 세션)가 함께 제공된다.
 - 커밋 시 Husky가 gitleaks+lint-staged(pre-commit)·commitlint(commit-msg, 설정은 `package.json`
   `commitlint` 키)를 강제한다. subject는 대문자/sentence-case 시작 금지(`subject-case`).
 
 ## 문서 지도
 
-- 설계 결정(왜): [`docs/adr/`](docs/adr/README.md) — 상태관리·FSD·orval·토큰 저장·관찰가능성·CSP.
+- 설계 결정(왜): [`docs/adr/`](docs/adr/README.md) — 상태관리·FSD·orval·토큰 저장·관찰가능성·CSP·디자인 시스템·데모/실배포·백엔드-우선.
