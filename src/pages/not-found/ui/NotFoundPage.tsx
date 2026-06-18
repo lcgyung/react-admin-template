@@ -14,9 +14,7 @@ export const NotFoundPage = () => (
       gap: 2,
     }}
   >
-    <Typography variant="h2" sx={{ fontWeight: 700 }}>
-      404
-    </Typography>
+    <Typography variant="h2">404</Typography>
     <Typography color="text.secondary">페이지를 찾을 수 없습니다.</Typography>
     <Button component={Link} to={paths.dashboard} variant="contained">
       홈으로

@@ -24,7 +24,7 @@ export const LoginPage = () => {
   return (
     <Card sx={{ width: '100%', maxWidth: 400 }}>
       <CardContent>
-        <Typography variant="h5" gutterBottom sx={{ fontWeight: 700 }}>
+        <Typography variant="h5" gutterBottom>
           로그인
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>

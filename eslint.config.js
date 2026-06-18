@@ -48,6 +48,16 @@ const local = {
   },
 };
 
+// axios 격리 path — 아래 두 no-restricted-imports 블록(전역 src/**, 엔티티)이 공유한다.
+// flat config 는 같은 룰 키를 마지막 매칭 블록이 통째로 덮어쓰므로, 엔티티 블록도 이 항목을 포함해야
+// axios 격리가 엔티티에서 조용히 풀리지 않는다(zod 만 넣지 말 것).
+const restrictAxiosInstance = {
+  name: '@/shared/api',
+  importNames: ['axiosInstance'],
+  message:
+    'axios 호출은 features/*/api 세그먼트에만 두세요. 컴포넌트는 React Query 훅(useAuth·useUsers)을 거칩니다.',
+};
+
 export default tseslint.config(
   {
     ignores: [
@@ -131,14 +141,33 @@ export default tseslint.config(
         { selector: 'objectLiteralProperty', format: null },
         { selector: 'import', format: null },
       ],
-      // 색상 하드코딩 금지 — sx/styled 등에서 #hex 리터럴 사용 시 theme 토큰 사용을 강제한다.
+      // MUI 톤앤매너 가드레일 — theme 토큰을 우회하는 인라인 색/타이포/style 을 차단한다.
       // 단일 소스인 features/theme/model/tokens.ts·스토리는 아래 override 로 예외. 위반 0건 확인 후 error 승격.
+      // 배경·정책: docs/adr/0010-design-theme-system.md
       'no-restricted-syntax': [
         'error',
         {
+          // 색 하드코딩(#hex) — sx/styled 등에서 리터럴 색 사용 시 theme 토큰 사용을 강제.
           selector: 'Literal[value=/^#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/]',
           message:
             '색상은 theme 토큰을 사용하세요(하드코딩 #hex 금지). features/theme 의 토큰을 참고하세요.',
+        },
+        {
+          // #hex 우회로 rgb()/hsl() 리터럴 색을 박는 것을 함께 차단(named color 는 false positive 방지로 제외 — 리뷰가 받음).
+          selector: 'Literal[value=/^(?:rgb|rgba|hsl|hsla)\\(/i]',
+          message:
+            '색상은 theme 토큰을 사용하세요(rgb/hsl 리터럴 금지). features/theme 의 토큰을 참고하세요.',
+        },
+        {
+          // 인라인 fontWeight/fontSize — Typography variant(테마 토큰) 우회 차단. 새 스케일이 필요하면 tokens.ts 에 variant 추가.
+          selector: 'Property[key.name=/^(fontWeight|fontSize)$/]',
+          message:
+            '타이포는 Typography variant(테마 토큰)를 쓰세요. 인라인 fontWeight/fontSize 금지 — 필요하면 features/theme/model/tokens.ts 에 variant 를 추가하세요.',
+        },
+        {
+          // 인라인 style prop — sx 사용을 강제(theme 토큰·다크모드·반응형 적용). 불가피하면 eslint-disable 로 한시 예외.
+          selector: "JSXAttribute[name.name='style']",
+          message: '인라인 style 대신 sx 를 사용하세요(theme 토큰·다크모드 적용).',
         },
       ],
       // 파일 구현 구조 강제(로컬 플러그인) — queryKey 상수 객체·named export 통일.
@@ -162,15 +191,24 @@ export default tseslint.config(
     files: ['src/**/*.{ts,tsx}'],
     ignores: ['src/**/api/**'],
     rules: {
+      'no-restricted-imports': ['error', { paths: [restrictAxiosInstance] }],
+    },
+  },
+  {
+    // 엔티티는 타입 전용 레이어 — 런타임 검증(zod)은 features/*/model/*Schema.ts 로 (FSD 레이어 정책).
+    // axios 격리도 함께 유지: flat config 는 같은 룰을 마지막 매칭 블록이 덮어쓰므로,
+    // restrictAxiosInstance 를 여기서도 포함해 엔티티에서 격리가 풀리지 않게 한다(zod 만 넣지 말 것).
+    files: ['src/entities/**/*.{ts,tsx}'],
+    rules: {
       'no-restricted-imports': [
         'error',
         {
           paths: [
+            restrictAxiosInstance,
             {
-              name: '@/shared/api',
-              importNames: ['axiosInstance'],
+              name: 'zod',
               message:
-                'axios 호출은 features/*/api 세그먼트에만 두세요. 컴포넌트는 React Query 훅(useAuth·useUsers)을 거칩니다.',
+                'zod 검증은 features/*/model/*Schema.ts 에 두세요. 엔티티는 타입 전용 레이어입니다(FSD 레이어 정책).',
             },
           ],
         },

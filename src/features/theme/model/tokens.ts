@@ -17,6 +17,7 @@ export const spacingUnit = 8;
 
 export const typography: ThemeOptions['typography'] = {
   fontFamily: [
+    'Pretendard Variable',
     'Pretendard',
     '-apple-system',
     'BlinkMacSystemFont',
@@ -29,6 +30,9 @@ export const typography: ThemeOptions['typography'] = {
   h1: { fontSize: '2rem', fontWeight: 700 },
   h2: { fontSize: '1.5rem', fontWeight: 700 },
   h3: { fontSize: '1.25rem', fontWeight: 600 },
+  h4: { fontWeight: 700 },
+  h5: { fontWeight: 700 },
+  h6: { fontWeight: 700 },
   button: { textTransform: 'none', fontWeight: 600 },
 };
 

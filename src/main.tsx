@@ -1,3 +1,7 @@
+// Pretendard 폰트 로드(테마 fontFamily 1순위). @fontsource/pretendard 는 latin-only 라 한글이 빠지므로,
+// 공식 pretendard 패키지의 variable dynamic-subset 을 쓴다(로컬 번들 → CSP 안전, 한글 unicode-range 지연 로드).
+import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css';
+
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 

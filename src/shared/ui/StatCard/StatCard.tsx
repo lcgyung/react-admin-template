@@ -13,9 +13,7 @@ export const StatCard = ({ label, value, hint }: StatCardProps) => (
       <Typography variant="overline" color="text.secondary">
         {label}
       </Typography>
-      <Typography variant="h4" sx={{ fontWeight: 700 }}>
-        {value}
-      </Typography>
+      <Typography variant="h4">{value}</Typography>
       {hint && (
         <Typography variant="caption" color="text.secondary">
           {hint}

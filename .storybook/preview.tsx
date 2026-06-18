@@ -1,3 +1,5 @@
+import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css';
+
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import type { Preview } from '@storybook/react-vite';
 
