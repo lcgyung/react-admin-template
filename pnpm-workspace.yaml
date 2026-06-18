@@ -28,3 +28,7 @@ onlyBuiltDependencies:
   - '@swc/core'
   - esbuild
   - msw
+# axios > form-data 가 4.0.5 를 끌어오는데 4.0.x 라인의 high CVE(GHSA-hmw2-7cc7-3qxx, CRLF injection)
+# 패치는 4.0.6+. axios 의 form-data ^4.0.0 범위와 호환되므로 patched 라인으로 고정한다(CI pnpm audit 차단 해소).
+overrides:
+  form-data: ^4.0.6
