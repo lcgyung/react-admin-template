@@ -1,3 +1,5 @@
+set -e
+
 # staged 변경에 시크릿이 없는지 검사(gitleaks 미설치 시 건너뜀 — CI 에서 강제).
 if command -v gitleaks >/dev/null 2>&1; then
   gitleaks protect --staged --redact --no-banner
@@ -6,3 +8,11 @@ else
 fi
 
 pnpm lint-staged
+
+# 스코프 검증: tsc·steiger 는 전체 그래프라 전체 차단, eslint·prettier 는 위 lint-staged 가
+# staged 로 스코프, 테스트는 staged 변경 관련만(커버리지 ratchet 은 CI 가 강제). 무관한 미staged
+# WIP 가 커밋을 막지 않는다. 전체 정본 검증은 pnpm verify(PR 전 로컬)·CI 가 담당.
+pnpm typecheck
+pnpm lint:fsd
+STAGED_SRC=$(git diff --cached --name-only --diff-filter=ACM -- 'src/**/*.ts' 'src/**/*.tsx')
+if [ -n "$STAGED_SRC" ]; then pnpm test:related $STAGED_SRC; fi
