@@ -13,6 +13,10 @@ paths:
 
 # 테스트 & 목 API 규칙
 
+> 테스트를 **코드보다 먼저** 쓰는 워크플로(RED-GREEN-REFACTOR)는 `.claude/skills/test-driven-development`
+> 스킬이 담당한다. 이 rule 은 그 테스트가 **무엇을 / 어떻게**(MSW 경유·entity 비대상·커버리지 래칫)
+> 돌아야 하는지의 정본이다.
+
 ## 목 API (MSW) — 테스트 전용 + 데모 옵트인
 
 MSW 는 데모 백엔드가 아니라 **테스트/데모 픽스처**다(백엔드-우선 워크플로, [ADR 0011](../../docs/adr/0011-backend-first-workflow.md)).
@@ -36,6 +40,7 @@ pnpm test:e2e                    # Playwright (preview:4173 기준)
 
 ## 커버리지 ratchet
 
-- `pnpm test:coverage`(v8)가 `vite.config.ts`의 임계값을 강제하고 CI의 test 스텝이 이를 사용한다.
-- 임계값은 현재 베이스라인 아래로 고정돼 있고, 테스트를 추가하며 PR마다 **점진 상향**한다.
-  **하향 금지.** (Stop 게이트의 `vitest run`은 속도를 위해 coverage 미포함.)
+- `pnpm test:coverage`(v8)가 `vite.config.ts`의 임계값을 강제하고 CI 의 test 스텝·`pnpm verify` 가 이를 사용한다.
+- 로컬 게이트(Stop `gate.sh`·pre-commit)는 `vitest related`(변경 파일 관련 테스트만, 커버리지 미포함)로
+  빠르게 검증한다 — **전체 커버리지 ratchet 은 `pnpm verify`·CI 가 강제**한다.
+- 임계값은 현재 베이스라인 아래로 고정돼 있고, 테스트를 추가하며 PR마다 **점진 상향**한다. **하향 금지.**
