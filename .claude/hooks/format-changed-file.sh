@@ -2,7 +2,7 @@
 # PostToolUse(Edit|Write|MultiEdit): 변경 파일만 포맷/린트 (pnpm)
 set -euo pipefail
 INPUT=$(cat)
-FILE=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
+FILE=$(printf '%s' "$INPUT" | jq -r '.tool_input.file_path // empty')
 [ -z "$FILE" ] && exit 0
 [ -f "$FILE" ] || exit 0
 

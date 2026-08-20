@@ -23,7 +23,7 @@ description: >-
 3. **경쟁 패턴 통일** — 같은 일을 하는 방식이 둘 이상이면 한 쪽을 표준으로 고정하고 나머지를 제거.
    표준이 모호하면 사용자에게 확인 후 진행.
 4. **제거** — 확정된 dead code/unused export 삭제. `import` 정리는 hook(`format-changed-file.sh`)·eslint 가 처리.
-5. **게이트 통과 확인** — `pnpm typecheck && pnpm lint && pnpm lint:fsd && pnpm test` (Stop 게이트와 동일 기준).
+5. **게이트 통과 확인** — `pnpm verify`(typecheck·lint·format:check·lint:fsd·test:coverage 전체 정본).
    깨지면 되돌리거나 수정.
 6. **단독 커밋** — `git commit -m "chore(cleanup): <무엇을 왜 제거했는지>"`. 기능 변경과 섞지 않는다.
 

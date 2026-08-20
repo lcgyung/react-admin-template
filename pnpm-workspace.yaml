@@ -12,18 +12,6 @@ allowBuilds:
 # 올리면 CI install 이 ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION 으로 막힌다(#28) — 운영 규약은
 # .claude/rules/security.md '공급망 — 의존성 유휴기간' 참조. 신뢰·긴급 패키지는 minimumReleaseAgeExclude 로 한시 예외.
 minimumReleaseAge: 1440
-# 한시 예외(TEMP) — #28(MUI v9 수동 마이그레이션)이 갓 게시된 9.1.1을 올려 24h 게이트(#28)에 걸렸다.
-# 정확한 버전만 예외라 미래 @mui 버전은 계속 게이트 보호된다. 9.1.1 게시 +24h(2026-06-12 06:37 UTC)
-# 이후엔 게이트를 자연 통과하므로 이 블록은 무력해진다 → 그 시점에 제거(제로베이스 복원).
-minimumReleaseAgeExclude:
-  - '@mui/material@9.1.1'
-  - '@mui/icons-material@9.1.1'
-  - '@mui/system@9.1.1'
-  - '@mui/utils@9.1.1'
-  - '@mui/types@9.1.1'
-  - '@mui/private-theming@9.1.1'
-  - '@mui/styled-engine@9.1.1'
-  - '@mui/core-downloads-tracker@9.1.1'
 onlyBuiltDependencies:
   - '@swc/core'
   - esbuild

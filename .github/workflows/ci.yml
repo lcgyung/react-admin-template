@@ -15,7 +15,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
@@ -28,6 +28,21 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      # 스펙 드리프트: 커밋된 생성물 == `pnpm gen:api` 재실행 결과인지 강제(스펙↔생성물 동기화).
+      # 스펙(openapi/admin-api.yaml)이 커밋돼 있을 때만 돈다 — 없으면 스킵(생성물도 없음).
+      - name: API drift check (생성물 == gen:api 재생성)
+        run: |
+          if [ -f openapi/admin-api.yaml ]; then
+            pnpm gen:api
+            git diff --exit-code -- src/shared/api/generated \
+              || { echo '::error::생성물이 스펙과 어긋납니다 — pnpm gen:api 후 커밋하세요.'; exit 1; }
+          else
+            echo 'openapi/admin-api.yaml 미존재 — 드리프트 체크 스킵.'
+          fi
+
+      - name: Format check (Prettier)
+        run: pnpm format:check
 
       - name: Lint
         run: pnpm lint
@@ -68,7 +83,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Secret scan (gitleaks, 전체 히스토리)
@@ -82,7 +97,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
@@ -125,7 +140,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
@@ -151,7 +166,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
